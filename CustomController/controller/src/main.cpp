@@ -12,8 +12,8 @@ void setup() {
 
 void loop() {
 	dataPacket.sendData();
-  input.readInputData();
+  	input.readInputData();
 	controllerLogic.mainFSM();
-  pages.displayPages();
+  	pages.displayPages();
 }
 
