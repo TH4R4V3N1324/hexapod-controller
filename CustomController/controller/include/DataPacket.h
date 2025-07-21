@@ -46,7 +46,6 @@ private:
     int previousTime = 0;
 
 public:
-    DataPacket(){initializeESPNow();};
     static void onHexDataReceived(const uint8_t *mac, const uint8_t *data, int len);
     void sendData();
     void initializeESPNow();

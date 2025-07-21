@@ -31,7 +31,6 @@ private:
     int center2Y = 0;
 
 public:
-    Input() {initializeInput();}
     static volatile int encoderCount;
     int lastEncoderCount = 0;
     int encoderDelta = 0;

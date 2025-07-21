@@ -17,7 +17,6 @@ private:
     const float SCROLL_THRESHOLD = 1.0f; // Change item when this is exceeded
     
 public:
-    Display() {initializeDisplay();}
     int item_selected;
     int item_previous;
     int item_next;

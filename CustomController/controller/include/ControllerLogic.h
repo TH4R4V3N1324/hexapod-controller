@@ -16,7 +16,6 @@ private:
     StateStack stateStack[STATE_STACK_MAX];
     int stackTop = -1;
     int stackIndex = 0;
-    States state;
     bool configStance = false;
 public:
     void pushState(int currentState, int selectedItem);

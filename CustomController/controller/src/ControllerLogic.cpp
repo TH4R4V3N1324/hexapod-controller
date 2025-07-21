@@ -17,11 +17,11 @@ StateStack ControllerLogic::popState() {
 void ControllerLogic::backPage() {
 	StateStack restored = popState();
 	display.item_selected = restored.item_selected;
-	state = restored.state;
+	pages.state = restored.state;
 }
 
 // Handles the scroll and selection logic for a given page
-void ControllerLogic::handleScrollAndSelect(page* pages, int itemCount, bool destination) {
+void ControllerLogic::handleScrollAndSelect(page* MenuPage, int itemCount, bool destination) {
 	if ((input.button1Z1 != input.button1Z0) && (!input.button1Z0)) {backPage(); return;}
 
 	int delta = input.encoderCount - input.lastEncoderCount;
@@ -35,8 +35,8 @@ void ControllerLogic::handleScrollAndSelect(page* pages, int itemCount, bool des
 	if (!destination) return;
 
 	if ((input.encoderButtonZ1 != input.encoderButtonZ0) && (!input.encoderButtonZ0)) {
-		pushState(state, display.item_selected);
-		state = pages[display.item_selected].destination;
+		pushState(pages.state, display.item_selected);
+		pages.state = MenuPage[display.item_selected].destination;
 		display.visualScrollIndex = 0.00f;
 		display.item_selected = 0; 
 	}
@@ -44,13 +44,13 @@ void ControllerLogic::handleScrollAndSelect(page* pages, int itemCount, bool des
 
 // Main controller logic
 void ControllerLogic::mainFSM() {
-	switch (state) {
+	switch (pages.state) {
 		case STATE_HOME:
 			if (input.encoderDelta >= input.encoderCountPerIndent) {controlPacket.currentHeight --; input.lastEncoderCount += input.encoderCountPerIndent;}
 		if (input.encoderDelta <= -input.encoderCountPerIndent) {controlPacket.currentHeight ++; input.lastEncoderCount -= input.encoderCountPerIndent;}
 			if ((input.button2Z1 != input.button2Z0) && (!input.button2Z0)) {pages.activeGait = static_cast<Gaits>((pages.activeGait + 1) % pages.GAIT_ITEMS); controlPacket.command = CMD_SET_GAIT; controlPacket.commandArgs[0] = pages.activeGait;}
 			if ((input.button3Z1 != input.button3Z0) && (!input.button3Z0)) {pages.activeMode = static_cast<Modes>((pages.activeMode + 1) % pages.MODE_ITEMS); controlPacket.command = CMD_SET_MODE; controlPacket.commandArgs[0] = pages.activeMode;}
-			if ((input.encoderButtonZ1 != input.encoderButtonZ0) && (!input.encoderButtonZ0)) {pushState(state, display.item_selected); state = STATE_MENU; input.lastEncoderCount = input.encoderCount;}
+			if ((input.encoderButtonZ1 != input.encoderButtonZ0) && (!input.encoderButtonZ0)) {pushState(pages.state, display.item_selected); pages.state = STATE_MENU; input.lastEncoderCount = input.encoderCount;}
 			break;
 		case STATE_MENU:
 			if (configStance) {controlPacket.command = CMD_HOME_STANCE; configStance = false;}

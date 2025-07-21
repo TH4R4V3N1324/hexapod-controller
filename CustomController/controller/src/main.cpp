@@ -8,6 +8,11 @@
 
 void setup() {
 	Serial.begin(115200);
+	dataPacket.initializeESPNow();
+	input.initializeInput();
+	display.initializeDisplay();
+
+	pages.state = STATE_HOME;
 }
 
 void loop() {

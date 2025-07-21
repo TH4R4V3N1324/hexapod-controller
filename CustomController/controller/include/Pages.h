@@ -30,11 +30,11 @@ enum Modes {MODE_NORMAL, MODE_STRAFE, MODE_TILT, MODE_CONFIG, NUM_MODES};
 
 class Pages {
 private:
-    States state;
     int currentPhase = 0;
 
 public:
     Pages();
+    States state;
     int leg_selected = 0;
     int joint_selected = 0;
     int jointOffset = 0;
