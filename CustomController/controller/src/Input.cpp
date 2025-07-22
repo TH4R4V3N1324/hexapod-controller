@@ -86,9 +86,9 @@ void Input::readStickData() {
 
     // Scale to -128 to 127
     int x1 = (x1Centered * 128L) / 2048;
-    int y2 = (y1Centered * 128L) / 2048;
+    int y1 = (y1Centered * 128L) / 2048;
     int x2 = (x2Centered * 128L) / 2048;
-    int y1 = (y2Centered * 128L) / 2048;
+    int y2 = (y2Centered * 128L) / 2048;
 
     // Deadzone
     if (abs(x1) < 25) x1 = 0;
