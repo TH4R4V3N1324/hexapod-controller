@@ -48,37 +48,37 @@
         "silk_text_thickness": 0.1,
         "silk_text_upright": false,
         "zones": {
-          "min_clearance": 0.5
+          "min_clearance": 0.0
         }
       },
       "diff_pair_dimensions": [],
       "drc_exclusions": [
         [
-          "hole_clearance|149449600|58635200|bf465662-aac5-4375-8e49-9f5004f77d2c|6659b2bf-b3e0-4152-96e2-5e0f4bcca707",
+          "copper_edge_clearance|124609800|50951191|f623a0d3-e53f-492d-9453-4ea1ed010ce8|42e1e8a7-627a-4b8e-bc90-b73cb78aab9b",
           ""
         ],
         [
-          "hole_clearance|149449600|58635200|e3874759-c585-41a9-9710-eb460564832b|6659b2bf-b3e0-4152-96e2-5e0f4bcca707",
+          "copper_edge_clearance|180109800|50951191|f623a0d3-e53f-492d-9453-4ea1ed010ce8|22b99b4a-a195-47e1-a166-ab29c9839588",
           ""
         ],
         [
-          "hole_clearance|155549600|58635200|1c1a36fd-e16f-4a61-b494-c6860b4ed615|937d223d-086b-4044-94db-a62bc78e80f1",
+          "hole_clearance|149449600|58635200|6659b2bf-b3e0-4152-96e2-5e0f4bcca707|bf465662-aac5-4375-8e49-9f5004f77d2c",
           ""
         ],
         [
-          "hole_clearance|155549600|58635200|41da87f7-9e71-4a31-8dd2-4015013a2b3b|937d223d-086b-4044-94db-a62bc78e80f1",
+          "hole_clearance|149449600|58635200|6659b2bf-b3e0-4152-96e2-5e0f4bcca707|e3874759-c585-41a9-9710-eb460564832b",
           ""
         ],
         [
-          "lib_footprint_mismatch|200718000|77429600|8384e461-eb90-4818-ab1c-a0b031349514|00000000-0000-0000-0000-000000000000",
+          "hole_clearance|155549600|58635200|937d223d-086b-4044-94db-a62bc78e80f1|1c1a36fd-e16f-4a61-b494-c6860b4ed615",
           ""
         ],
         [
-          "silk_over_copper|171848357|91200200|7778f944-4e6a-460a-b20e-1756edaa8d69|00000000-0000-0000-0000-000000000000",
+          "hole_clearance|155549600|58635200|937d223d-086b-4044-94db-a62bc78e80f1|41da87f7-9e71-4a31-8dd2-4015013a2b3b",
           ""
         ],
         [
-          "silk_overlap|132733200|91050600|3692c90e-4fbf-4d22-aef2-d334187ea5ff|7778f944-4e6a-460a-b20e-1756edaa8d69",
+          "silk_edge_clearance|121609800|51441381|8de367e1-78f5-4806-94f6-5a5d05cda08a|7778f944-4e6a-460a-b20e-1756edaa8d69",
           ""
         ]
       ],
@@ -434,6 +434,7 @@
       "bus_entry_needed": "error",
       "bus_to_bus_conflict": "error",
       "bus_to_net_conflict": "error",
+      "conflicting_netclasses": "error",
       "different_unit_footprint": "error",
       "different_unit_net": "error",
       "duplicate_reference": "error",
@@ -588,12 +589,66 @@
           "label": "Datasheet",
           "name": "Datasheet",
           "show": true
+        },
+        {
+          "group_by": false,
+          "label": "Arrow Price/Stock",
+          "name": "Arrow Price/Stock",
+          "show": false
+        },
+        {
+          "group_by": false,
+          "label": "Height",
+          "name": "Height",
+          "show": false
+        },
+        {
+          "group_by": false,
+          "label": "Manufacturer_Name",
+          "name": "Manufacturer_Name",
+          "show": false
+        },
+        {
+          "group_by": false,
+          "label": "Manufacturer_Part_Number",
+          "name": "Manufacturer_Part_Number",
+          "show": false
+        },
+        {
+          "group_by": false,
+          "label": "Mouser Part Number",
+          "name": "Mouser Part Number",
+          "show": false
+        },
+        {
+          "group_by": false,
+          "label": "Mouser Price/Stock",
+          "name": "Mouser Price/Stock",
+          "show": false
+        },
+        {
+          "group_by": false,
+          "label": "Arrow Part Number",
+          "name": "Arrow Part Number",
+          "show": false
+        },
+        {
+          "group_by": false,
+          "label": "Description",
+          "name": "Description",
+          "show": false
+        },
+        {
+          "group_by": false,
+          "label": "#",
+          "name": "${ITEM_NUMBER}",
+          "show": false
         }
       ],
       "filter_string": "",
       "group_symbols": true,
       "include_excluded_from_bom": true,
-      "name": "Default Editing",
+      "name": "",
       "sort_asc": true,
       "sort_field": "Reference"
     },
