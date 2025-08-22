@@ -74,10 +74,6 @@
           ""
         ],
         [
-          "clearance|153175000|56945000|5471cc08-3a63-4f5d-8eff-acf88483bb07|f6babaff-6ace-4935-91c2-0cc9860f9afc",
-          ""
-        ],
-        [
           "clearance|153250000|57445000|526380fe-c64b-4a8e-a8b9-66701951cf8f|f6babaff-6ace-4935-91c2-0cc9860f9afc",
           ""
         ],
@@ -86,35 +82,27 @@
           ""
         ],
         [
-          "copper_edge_clearance|124609800|50951191|f623a0d3-e53f-492d-9453-4ea1ed010ce8|42e1e8a7-627a-4b8e-bc90-b73cb78aab9b",
+          "copper_edge_clearance|124909800|50951191|f623a0d3-e53f-492d-9453-4ea1ed010ce8|42e1e8a7-627a-4b8e-bc90-b73cb78aab9b",
           ""
         ],
         [
-          "copper_edge_clearance|180109800|50951191|f623a0d3-e53f-492d-9453-4ea1ed010ce8|22b99b4a-a195-47e1-a166-ab29c9839588",
+          "copper_edge_clearance|180409800|50951191|f623a0d3-e53f-492d-9453-4ea1ed010ce8|22b99b4a-a195-47e1-a166-ab29c9839588",
           ""
         ],
         [
-          "hole_clearance|149450000|57020000|bf465662-aac5-4375-8e49-9f5004f77d2c|6659b2bf-b3e0-4152-96e2-5e0f4bcca707",
+          "hole_clearance|149450000|57020000|6659b2bf-b3e0-4152-96e2-5e0f4bcca707|bf465662-aac5-4375-8e49-9f5004f77d2c",
           ""
         ],
         [
-          "hole_clearance|149450000|57020000|e3874759-c585-41a9-9710-eb460564832b|6659b2bf-b3e0-4152-96e2-5e0f4bcca707",
+          "hole_clearance|149450000|57020000|6659b2bf-b3e0-4152-96e2-5e0f4bcca707|e3874759-c585-41a9-9710-eb460564832b",
           ""
         ],
         [
-          "hole_clearance|155550000|57020000|1c1a36fd-e16f-4a61-b494-c6860b4ed615|937d223d-086b-4044-94db-a62bc78e80f1",
+          "hole_clearance|155550000|57020000|937d223d-086b-4044-94db-a62bc78e80f1|1c1a36fd-e16f-4a61-b494-c6860b4ed615",
           ""
         ],
         [
-          "hole_clearance|155550000|57020000|41da87f7-9e71-4a31-8dd2-4015013a2b3b|937d223d-086b-4044-94db-a62bc78e80f1",
-          ""
-        ],
-        [
-          "silk_edge_clearance|183109800|51173455|0352e776-a458-4e12-9ffb-ff0953555600|7778f944-4e6a-460a-b20e-1756edaa8d69",
-          ""
-        ],
-        [
-          "silk_overlap|121459171|73840865|00864664-6190-402a-9d74-37be78c11c69|7778f944-4e6a-460a-b20e-1756edaa8d69",
+          "hole_clearance|155550000|57020000|937d223d-086b-4044-94db-a62bc78e80f1|41da87f7-9e71-4a31-8dd2-4015013a2b3b",
           ""
         ]
       ],
