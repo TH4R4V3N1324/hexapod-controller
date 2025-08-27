@@ -3,21 +3,21 @@
 #include "DataPacket.h"
 #include <stdint.h>
 #include <Arduino.h>
-#define stick1X 16
-#define stick1Y 17 
-#define stick2X 18  
-#define stick2Y 19  
-#define button1 4
-#define button2 5
-#define button3 6
-#define button4 7
-#define switch1 8
-#define switch2 9
-#define switch3 10
-#define switch4 11
-#define encoderA 20
-#define encoderB 21
-#define encoderButton 33
+#define stick1X 2
+#define stick1Y 1
+#define stick2X 5 
+#define stick2Y 6 
+#define button1 38
+#define button2 39
+#define button3 40
+#define button4 41
+#define switch1 15
+#define switch2 14
+#define switch3 16
+#define switch4 17
+#define encoderA 9
+#define encoderB 8
+#define encoderButton 7
 
 // Declaration of encoder states
 enum EncoderStates {AB, Ab, aB, ab};

@@ -1,7 +1,7 @@
 #include "Display.h"
 
 // Constructor for OLED screen, esp32s2 SPI default is 36(SCK) and 35(MOSI)
-U8G2_SSD1309_128X64_NONAME0_F_4W_HW_SPI u8g2(U8G2_R0, /* cs=*/ 0, /* dc=*/ 1, /* reset=*/ 2);
+U8G2_SSD1309_128X64_NONAME0_F_4W_HW_SPI u8g2(U8G2_R0, /* cs=*/ 34, /* dc=*/ 33, /* reset=*/ 21);
 
 Display display;
 
