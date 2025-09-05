@@ -11,7 +11,7 @@ void IMUSensor::init() {
     // Reset the sensor
     uint8_t reset = 0xB6;
     i2cManager.writeRegister(BMI330_ADDR, BMI330_CMD, &reset, 1);
-    vTaskDelay(5 / portTICK_PERIOD_MS);
+    vTaskDelay(10 / portTICK_PERIOD_MS);
 
     // Configure power settings
     uint8_t pwr_conf = 0x00;
