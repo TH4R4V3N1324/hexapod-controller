@@ -5,7 +5,9 @@ volatile int Input::encoderCount = 0;
 
 Input input;
 
-// State machine to interpret encoder states
+/*
+@brief State machine to interpret encoder states
+*/
 void Input::doEncoderFSM() {
     switch (encoderState) {
         case AB:
@@ -30,7 +32,9 @@ void Input::doEncoderFSM() {
     }
 }
 
-// Sets encoder initial state
+/*
+@brief Initializes the encoder state machine
+*/
 void Input::initializeEncoder() {
     if (digitalRead(encoderA) && digitalRead(encoderB)) encoderState = AB;
     if (!digitalRead(encoderA) && digitalRead(encoderB)) encoderState = aB;
@@ -38,14 +42,18 @@ void Input::initializeEncoder() {
     if (!digitalRead(encoderA) && !digitalRead(encoderB)) encoderState = ab;
 }
 
-// Reads the data from controller inputs
+/*
+@brief Reads input data from various sources
+*/
 void Input::readInputData() {
     encoderDelta = encoderCount - lastEncoderCount;
     readButtonData();
     readStickData();
 }
 
-// Reads debounced states of buttons
+/*
+@brief Reads debounced states of buttons
+*/
 void Input::readButtonData() {
     button1Z1 = button1Z0; button1Z0 = digitalRead(button1);
     button2Z1 = button2Z0; button2Z0 = digitalRead(button2);
@@ -54,7 +62,11 @@ void Input::readButtonData() {
     encoderButtonZ1 = encoderButtonZ0; encoderButtonZ0 = digitalRead(encoderButton);
 }
 
-// Calibrates the centre position of a joystick
+/*
+@brief Calibrates the center position of a joystick
+@param pin The analog pin connected to the joystick axis
+@return The calibrated center value
+*/
 int Input::calibrateCenter(int pin) {
     long total = 0;
     const int samples = 20;
@@ -67,7 +79,9 @@ int Input::calibrateCenter(int pin) {
     return total / samples;
 }
 
-// Reads and interprets raw joystick data
+/*
+@brief Reads and interprets raw joystick data
+*/
 void Input::readStickData() {
     int x1Raw = analogRead(stick1X);
     int y1Raw = analogRead(stick1Y);
@@ -102,7 +116,9 @@ void Input::readStickData() {
     controlPacket.joystick2Y = constrain(y2, -128, 127);
 }
 
-// Sets center positions for joysticks
+/*
+@brief Initializes the joystick center positions
+*/
 void Input::initializeJoystick() {
     center1X = calibrateCenter(stick1X);
     center1Y = calibrateCenter(stick1Y);
@@ -110,7 +126,9 @@ void Input::initializeJoystick() {
     center2Y = calibrateCenter(stick2Y);
 }
 
-// Initializes the input system
+/*
+@brief Initializes the input system
+*/
 void Input::initializeInput() {
     pinMode(encoderButton, INPUT_PULLUP);
     pinMode(encoderA, INPUT_PULLUP);

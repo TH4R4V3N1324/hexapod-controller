@@ -5,7 +5,10 @@ ControlPacket controlPacket = {};
 HexPacket hexPacket = {};
 DataPacket dataPacket;
 
-// Sends data to Hexapod esp32 at regular intervals
+/*
+@brief Sends data to Hexapod esp32 at regular intervals
+@note This function uses esp_now_send to transmit the controlPacket
+*/
 void DataPacket::sendData() {
   unsigned long currentTime = millis();
   if (currentTime - previousTime > 10) {  // send every 10ms
@@ -14,7 +17,12 @@ void DataPacket::sendData() {
   }
 }
 
-// ESP-NOW receive callback for Arduino ESP32
+/*
+@brief ESP-NOW receive callback for Arduino ESP32
+@param mac The MAC address of the sender
+@param data The received data
+@param len The length of the received data
+*/
 void DataPacket::onHexDataReceived(const uint8_t *mac, const uint8_t *data, int len) {
 	static bool firstPacket = true;
 	if (len == sizeof(HexPacket)) {
@@ -26,6 +34,9 @@ void DataPacket::onHexDataReceived(const uint8_t *mac, const uint8_t *data, int 
 	}
 }
 
+/*
+@brief Initializes ESP-NOW for communication
+*/
 void DataPacket::initializeESPNow() {
 	WiFi.mode(WIFI_STA);
 	esp_now_init();

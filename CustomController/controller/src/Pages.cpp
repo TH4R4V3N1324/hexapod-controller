@@ -41,6 +41,10 @@ Pages::Pages():
         {"Animation 5", nullptr, STATE_NONE}
     }{}
 
+/*
+@brief Renders the home page with switch states, gait, mode, phase, height, and menu button
+@note Uses icons to represent switch states and mode
+*/
 void Pages::homePage() {
 	// Switch 1
 	u8g2.setFont(u8g2_font_4x6_mf);
@@ -98,16 +102,28 @@ void Pages::homePage() {
 	u8g2.drawXBMP(75, 15, 42, 42, MODE[activeMode].icon);
 }
 
+/*
+@brief Renders the menu page with available menu items
+@note Displays item icons
+*/
 void Pages::menuPage() {
 	display.setupNav("Menu");
 	display.drawPageItems(MENU, MENU_ITEMS, true);
 }
 
+/*
+@brief Renders the configuration page with available configuration items
+@note Displays leg items with hex icons
+*/
 void Pages::configPage() {
 	display.setupNav("Menu>Config");
 	display.drawPageItems(CONFIG, CONFIG_ITEMS, false, true);
 }
 
+/*
+@brief Renders the leg configuration page with available leg items
+@note Displays current offset for selected joint and leg
+*/
 void Pages::legPage() {
 	char navHeading[64];
 	snprintf(navHeading, sizeof(navHeading), "Menu>Config>%s", CONFIG[leg_selected].item);
@@ -125,18 +141,30 @@ void Pages::legPage() {
     if (display.item_selected == tibia) u8g2.drawXBMP(108, 26, 3, 3, epd_bitmap_joint_selected_icon);
 }
 
+/*
+@brief Renders the gait configuration page with available gait items
+@note Highlights the currently active gait
+*/
 void Pages::gaitPage() {
 	display.setupNav("Menu>Gait");
 	display.drawPageItems(GAIT, GAIT_ITEMS, false, false);
 	display.drawActiveItem(GAIT_ITEMS, activeGait);
 }
 
+/*
+@brief Renders the mode configuration page with available mode items
+@note Highlights the currently active mode
+*/
 void Pages::modePage() {
 	display.setupNav("Menu>Mode");
 	display.drawPageItems(MODE, MODE_ITEMS, false, true);
 	display.drawActiveItem(MODE_ITEMS, activeMode);
 }
 
+/*
+@brief Renders the joint configuration page with available joint items
+@note Displays current offset for selected joint and leg
+*/
 void Pages::jointPage() {
 	char navHeading[64];  // Make sure buffer is big enough
 	snprintf(navHeading, sizeof(navHeading), "Menu>Config>%s>%s", CONFIG[leg_selected].item, LEG[joint_selected].item);
@@ -156,11 +184,19 @@ void Pages::jointPage() {
     u8g2.drawStr(5, 60, "Save");
 }
 
+/*
+@brief Renders the animation configuration page with available animation items
+@note Currently does not display icons
+*/
 void Pages::animationPage() {
 	display.setupNav("Menu>Animation");
 	display.drawPageItems(ANIMATION, ANIMATION_ITEMS, false, false);
 }
 
+/*
+@brief Main display function to render the current page based on state
+@note Calls specific page rendering functions based on the current state
+*/
 void Pages::displayPages() {
     u8g2.firstPage();
     do {

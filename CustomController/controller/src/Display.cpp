@@ -5,13 +5,24 @@ U8G2_SSD1309_128X64_NONAME0_F_4W_HW_SPI u8g2(U8G2_R0, /* cs=*/ 34, /* dc=*/ 33, 
 
 Display display;
 
+/*
+@brief Calculates the circular delta between two values
+@param from The starting value
+@param to The target value
+@param size The range of values
+@return The circular delta
+*/
 float Display::circularDelta(float from, float to, int size) {
 	float delta = fmodf((to - from + size), size);
 	if (delta > size / 2.0f) delta -= size;
 	return delta;
 }
 
-// Setups the back button and nav bar
+/*
+@brief Sets up the navigation bar with a heading
+@param heading The heading text to display
+@note Draws a "Back" button and the heading on the navigation bar
+*/
 void Display::setupNav(const char* heading) {
 	u8g2.setFont(u8g2_font_4x6_mf);
 	u8g2.drawXBMP(0, 0, 26, 10, epd_bitmap_button_boarder);
@@ -19,7 +30,12 @@ void Display::setupNav(const char* heading) {
 	u8g2.drawStr(29, 7, heading);
 }
 
-// Draws the "Selected" icon on the active item
+/*
+@brief Draws the "Selected" icon on the active item
+@param NUM_ITEMS The total number of items
+@param activeItem The index of the currently active item
+@note The active item is highlighted with a special icon
+*/
 void Display::drawActiveItem(int NUM_ITEMS, int activeItem) {
 	// Number of items
 	const int itemCount = NUM_ITEMS;
@@ -39,7 +55,13 @@ void Display::drawActiveItem(int NUM_ITEMS, int activeItem) {
 	if (yPos >= 15 && yPos <= 51) {u8g2.drawXBMP(5, yPos, 7, 7, epd_bitmap_selected_icon);}
 }
 
-// Main logic for displaying page items and their icons if available
+/*
+@brief Draws the page items and their icons if available
+@param pages The array of page items
+@param NUM_ITEMS The total number of items
+@param itemIcons Whether to display item icons
+@param hexIcon Whether to display the hex icon
+*/
 void Display::drawPageItems(page* pages, int NUM_ITEMS, bool itemIcons, bool hexIcon) {
 	float delta = circularDelta(visualScrollIndex, (float)item_selected, NUM_ITEMS);
 	visualScrollIndex += 0.2f * delta;
@@ -82,6 +104,9 @@ void Display::drawPageItems(page* pages, int NUM_ITEMS, bool itemIcons, bool hex
 	}
 }
 
+/*
+@brief Initializes the display
+*/
 void Display::initializeDisplay() {
     // Initialize the display
     u8g2.begin();

@@ -2,25 +2,40 @@
 
 ControllerLogic controllerLogic;
 
-// Adds state and current position of the cursor to the stack used for navigation
+/*
+@brief Pushes the current state and cursor position onto the state stack
+@param currentState The current state to be pushed onto the stack
+@param selectedItem The current cursor position to be pushed onto the stack
+*/
 void ControllerLogic::pushState(int currentState, int selectedItem) {
   if (stackIndex < STATE_STACK_MAX) {stateStack[stackIndex++] = { currentState, selectedItem };}
 }
 
-// Returns the state and position from the previous page
+/*
+@brief Pops the state and cursor position from the state stack
+@return The state and cursor position from the previous page
+*/
 StateStack ControllerLogic::popState() {
   if (stackIndex > 0) {return stateStack[--stackIndex];}
   return { 0, 0 };  // Default fallback
 }
 
-// Return to previous page and cursor position
+/*
+@brief Navigates back to the previous page by popping the state stack
+*/
 void ControllerLogic::backPage() {
 	StateStack restored = popState();
 	display.item_selected = restored.item_selected;
 	pages.state = restored.state;
 }
 
-// Handles the scroll and selection logic for a given page
+/*
+@brief Handles the scroll and selection logic for a given page
+@param MenuPage The page structure containing menu items and their destinations
+@param itemCount The number of items in the menu
+@param destination If true, allows navigation to the destination state on selection
+@note If destination is false, selection will not change the state
+*/
 void ControllerLogic::handleScrollAndSelect(page* MenuPage, int itemCount, bool destination) {
 	if ((input.button1Z1 != input.button1Z0) && (!input.button1Z0)) {backPage(); return;}
 
@@ -42,7 +57,10 @@ void ControllerLogic::handleScrollAndSelect(page* MenuPage, int itemCount, bool 
 	}
 }
 
-// Main controller logic
+/*
+@brief Main finite state machine for controlling the robot
+@note This function handles state transitions and actions based on user input
+*/
 void ControllerLogic::mainFSM() {
 	switch (pages.state) {
 		case STATE_HOME:
