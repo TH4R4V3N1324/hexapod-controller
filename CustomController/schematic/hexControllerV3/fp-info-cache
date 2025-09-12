@@ -1,4 +1,4 @@
-26424481608966656
+26452170078270833
 Audio_Module
 Reverb_BTDR-1H
 Digital Reverberation Unit, http://www.belton.co.kr/inc/downfile.php?seq=17&file=pdf (footprint from http://www.uk-electronic.de/PDF/BTDR-1.pdf)
@@ -96459,6 +96459,118 @@ rotary encoder illuminated switch vertical
 0
 9
 8
+SamacSys_Parts
+BMI330
+3 X 2.5 X 0.87mm
+Undefined or Miscellaneous
+0
+14
+14
+SamacSys_Parts
+CAPPRD500W60D1050H2200
+10mmX20mm-ren1
+Capacitor Polarised
+0
+2
+2
+SamacSys_Parts
+DIP794W53P254L1930H508Q16N
+16 pdip
+Integrated Circuit
+0
+16
+16
+SamacSys_Parts
+ESP32S3MINI1UN8
+15.4mmx15.4mmx2.40mm
+Integrated Circuit
+0
+73
+73
+SamacSys_Parts
+LTM4620AEVPBF
+LGA 144-Lead (15mm × 15mm × 4.41mm)
+Integrated Circuit
+0
+144
+144
+SamacSys_Parts
+NE555DR
+D (R-PDSO-G8)
+Integrated Circuit
+0
+8
+8
+SamacSys_Parts
+PICO
+PICO
+Connector
+0
+53
+53
+SamacSys_Parts
+QFN50P400X400X100-25N-D
+RGE0024B
+Integrated Circuit
+0
+25
+25
+SamacSys_Parts
+RCE7U2J333J5B1H03B
+L=7.5mm W=8.0mm T=4.0mm
+Capacitor
+0
+2
+2
+SamacSys_Parts
+RDER72E154K3M1H03A
+L=5.5mm W=5.0mm T=4.0mm P = 5
+Capacitor
+0
+2
+2
+SamacSys_Parts
+RESAD1650W60L650D250
+MRS25
+Resistor
+0
+2
+2
+SamacSys_Parts
+SOP65P640X120-16N
+PW
+Integrated Circuit
+0
+16
+16
+SamacSys_Parts
+SOP65P640X120-20N
+pw(r-pdso-g20)-
+Integrated Circuit
+0
+20
+20
+SamacSys_Parts
+STM32 Nucleo-32 MCU Development Board NUCLEO-F031K6
+PICO-2
+Connector
+0
+30
+30
+SamacSys_Parts
+TO-92-PLASTIC_2
+TO-92-PLASTIC
+Transistor BJT NPN
+0
+3
+3
+SamacSys_Parts
+TO270P460X1020X2008-3P
+TO-220
+MOSFET (N-Channel)
+0
+3
+3
 Sensor
 ASAIR_AM2302_P2.54mm_Lead2.75mm_TabDown
 Temperature and humidity module, http://akizukidenshi.com/download/ds/aosong/AM2302.pdf
