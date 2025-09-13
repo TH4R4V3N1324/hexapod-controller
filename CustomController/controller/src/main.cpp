@@ -5,9 +5,16 @@
 #include "Display.h"
 #include "ControllerLogic.h"
 #include <Arduino.h>
+#include "USB.h"
+
+USBCDC USBSerial;
 
 void setup() {
 	Serial.begin(115200);
+	Serial.setDebugOutput(true);
+	USBSerial.begin();
+	USB.begin();
+
 	dataPacket.initializeESPNow();
 	input.initializeInput();
 	display.initializeDisplay();
