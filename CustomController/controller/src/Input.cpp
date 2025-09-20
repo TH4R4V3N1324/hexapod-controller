@@ -151,3 +151,28 @@ void Input::initializeInput() {
     // Read joystick center positions
     initializeJoystick();
 }
+
+/*
+@brief Prints the current state of the controller inputs
+@param serial The Print object to send output to
+@note Used for debugging purposes
+*/
+void Input::printControllerInputs(Print& serial) {
+    // Analog stick positions
+    serial.print("Stick1 X: "); serial.print(controlPacket.joystick1X);
+    serial.print(" | Stick1 Y: "); serial.print(controlPacket.joystick1Y);
+    serial.print(" | Stick2 X: "); serial.print(controlPacket.joystick2X);
+    serial.print(" | Stick2 Y: "); serial.print(controlPacket.joystick2Y);
+
+    // Button states
+    serial.print(" | Btn1: "); serial.print(button1Z1);
+    serial.print(" | Btn2: "); serial.print(button2Z1);
+    serial.print(" | Btn3: "); serial.print(button3Z1);
+    serial.print(" | Btn4: "); serial.print(button4Z1);
+
+    // Encoder and encoder button
+    serial.print(" | Encoder: "); serial.print(encoderCount);
+    serial.print(" | Encoder Btn: "); serial.print(encoderButtonZ1);
+
+    serial.println();
+}

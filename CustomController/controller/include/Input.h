@@ -53,6 +53,7 @@ public:
     void initializeInput();
     int calibrateCenter(int pin);
     void initializeJoystick();
+    void printControllerInputs(Print& serial);
 };
 
 extern Input input;
