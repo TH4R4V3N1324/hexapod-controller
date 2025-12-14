@@ -56,56 +56,17 @@ page ANIMATION[] = {
 };
 const int ANIMATION_SIZE = sizeof(ANIMATION) / sizeof(ANIMATION[0]);
 
-void FSM(){
-    switch (currentState) {
-        case STATE_HOME:
-            homePage();
-            break;
-        case STATE_MENU:
-            mainMenu();
-            break;
-        case STATE_CONFIG:
-            configPage();
-            break;
-        case STATE_MODE:
-            modePage();
-            break;
-        case STATE_GAIT:
-            gaitPage();
-            break;
-        case STATE_ANIMATION:
-            animationPage();
-            break;
-        case STATE_LEG:
-            legPage();
-            break;
-        case STATE_JOINT:
-            jointPage();
-            break;
-        default:
-            break;
-    }    
-}
-
 static void menu_btn_event_cb(lv_event_t *e) {
-    previousState = currentState;
-    currentState = STATE_MENU;
-    mainMenu(); // Show your menu
+    menuPage();
 }
 
 static void back_btn_event_cb(lv_event_t *e) {
-    StateStack restored = popState();
-	currentState = restored.state;
-    FSM();
-}
-
-static void menu_item_event_cb(lv_event_t *e) {
-    States dest = (States)(intptr_t)lv_event_get_user_data(e);
-    if(dest == STATE_NONE) return; // No state change for NONE destinations
-    previousState = currentState;
-    currentState = dest;
-    pushState(previousState);
-    FSM();
+    lv_obj_t * obj = lv_event_get_target(e);
+    lv_obj_t * menu = (lv_obj_t *)lv_event_get_user_data(e);
+    // If on root page, go home
+    if(lv_menu_back_btn_is_root(menu, obj)) {
+        homePage();
+    }
 }
 
 void homePage() {
@@ -125,122 +86,123 @@ void homePage() {
     lv_scr_load(home_screen);
 }
 
-void mainMenu() {
-   lv_obj_t * menu_screen = lv_obj_create(NULL);
-   lv_obj_set_style_bg_color(menu_screen, lv_color_black(), 0);
+void menuPage() {
+    lv_obj_t * menu = lv_menu_create(lv_scr_act());
+    lv_menu_set_mode_root_back_btn(menu, LV_MENU_ROOT_BACK_BTN_ENABLED);
+    lv_obj_add_event_cb(menu, back_btn_event_cb, LV_EVENT_CLICKED, menu);
+    lv_obj_set_size(menu, 480, 640);
+    lv_obj_center(menu);
+    lv_obj_set_style_bg_color(menu, lv_color_black(), 0);
+    lv_obj_set_style_text_color(menu, lv_color_white(), 0);
+    lv_obj_set_style_text_font(menu, &lv_font_montserrat_32, 0);
+    lv_obj_set_style_text_color(lv_menu_get_main_header_back_btn(menu), lv_color_white(), 0);
 
-   lv_obj_t * back_btn = lv_btn_create(menu_screen);
-   lv_obj_set_size(back_btn, 90, 40);
-   lv_obj_align(back_btn, LV_ALIGN_TOP_LEFT, 10, 10);
-   lv_obj_t * back_label = lv_label_create(back_btn);
-   lv_label_set_text(back_label, "Back");
-   lv_obj_set_style_text_font(back_label, &lv_font_montserrat_24, 0);
 
-   lv_obj_add_event_cb(back_btn, back_btn_event_cb, LV_EVENT_CLICKED, (void*)(intptr_t)previousState);
+    lv_obj_t * cont;
+    lv_obj_t * label;
 
-   // Menu title
-   lv_obj_t * menu_label = lv_label_create(menu_screen);
-   lv_label_set_text(menu_label, "Menu");
-   lv_obj_set_style_text_color(menu_label, lv_color_white(), 0);
-   lv_obj_set_style_text_font(menu_label, &lv_font_montserrat_24, 0);
-   lv_obj_align(menu_label, LV_ALIGN_TOP_MID, 0, 10);
+    // config page
+    lv_obj_t * config_page = lv_menu_page_create(menu, "Config");
 
-   // Menu items
-   for (int i = 0; i < MENU_SIZE; i++) {
-       // Icon
-       lv_obj_t * icon = lv_label_create(menu_screen);
-       lv_label_set_text(icon, MENU[i].icon);
-       lv_obj_set_style_text_color(icon, lv_color_white(), 0);
-       lv_obj_set_style_text_font(icon, &lv_font_montserrat_24, 0);
-       lv_obj_align(icon, LV_ALIGN_TOP_LEFT, 30, 80 + i * 80);
+    // leg selection
+    cont = lv_menu_cont_create(config_page);
+    lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_ROW);
+    lv_obj_set_flex_align(cont, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
 
-       // Button
-       lv_obj_t * btn = lv_btn_create(menu_screen);
-       lv_obj_set_size(btn, 300, 60);
-       lv_obj_align(btn, LV_ALIGN_TOP_LEFT, 100, 70 + i * 80);
-       lv_obj_t * btn_label = lv_label_create(btn);
-       lv_label_set_text(btn_label, MENU[i].item);
-       lv_obj_set_style_text_font(btn_label, &lv_font_montserrat_24, 0);
+    label = lv_label_create(cont); 
+    lv_label_set_text(label, "Leg");
 
-       lv_obj_add_event_cb(btn, menu_item_event_cb, LV_EVENT_CLICKED, (void*)(intptr_t)MENU[i].destination);
-   }
+    lv_obj_t * leg_dd = lv_dropdown_create(cont);
+    char leg_options[128] = "";
+    for (int i = 0; i < CONFIG_SIZE; i++) {
+        strcat(leg_options, CONFIG[i].item);
+        if (i < CONFIG_SIZE - 1) strcat(leg_options, "\n");
+    }
+    lv_dropdown_set_options(leg_dd, leg_options);
+    lv_dropdown_set_selected(leg_dd, 0);
+    lv_obj_set_width(leg_dd, 200);
 
-   lv_scr_load(menu_screen); 
-}
+    // joint selection
+    cont = lv_menu_cont_create(config_page);
+    lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_ROW);
+    lv_obj_set_flex_align(cont, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
 
-void configPage() {
-   lv_obj_t * config_screen = lv_obj_create(NULL);
-   lv_obj_set_style_bg_color(config_screen, lv_color_black(), 0);
+    label = lv_label_create(cont);
+    lv_label_set_text(label, "Joint");
 
-   lv_obj_t * back_btn = lv_btn_create(config_screen);
-   lv_obj_set_size(back_btn, 90, 40);
-   lv_obj_align(back_btn, LV_ALIGN_TOP_LEFT, 10, 10);
-   lv_obj_t * back_label = lv_label_create(back_btn);
-   lv_label_set_text(back_label, "Back");
-   lv_obj_set_style_text_font(back_label, &lv_font_montserrat_24, 0);
+    lv_obj_t * joint_dd = lv_dropdown_create(cont);
+    char joint_options[128] = "";
+    for (int i = 0; i < LEG_SIZE; i++) {
+        strcat(joint_options, LEG[i].item);
+        if (i < LEG_SIZE - 1) strcat(joint_options, "\n");
+    }
+    lv_dropdown_set_options(joint_dd, joint_options);
+    lv_dropdown_set_selected(joint_dd, 0);
+    lv_obj_set_width(joint_dd, 200);
 
-   lv_obj_add_event_cb(back_btn, back_btn_event_cb, LV_EVENT_CLICKED, (void*)(intptr_t)previousState);
+    // offset selection
+    cont = lv_menu_cont_create(config_page);
+    lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_ROW);
+    lv_obj_set_flex_align(cont, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
 
-   // Config title
-   lv_obj_t * config_label = lv_label_create(config_screen);
-   lv_label_set_text(config_label, "Config");
-   lv_obj_set_style_text_color(config_label, lv_color_white(), 0);
-   lv_obj_set_style_text_font(config_label, &lv_font_montserrat_24, 0);
-   lv_obj_align(config_label, LV_ALIGN_TOP_MID, 0, 10);
+    label = lv_label_create(cont);
+    lv_label_set_text(label, "Offset");
 
-   // Config items
-   for (int i = 0; i < CONFIG_SIZE; i++) {
-       // Icon
-       lv_obj_t * icon = lv_label_create(config_screen);
-       lv_label_set_text(icon, CONFIG[i].icon);
-       lv_obj_set_style_text_color(icon, lv_color_white(), 0);
-       lv_obj_set_style_text_font(icon, &lv_font_montserrat_24, 0);
-       lv_obj_align(icon, LV_ALIGN_TOP_LEFT, 30, 80 + i * 80);
+    lv_obj_t * offset_spinbox = lv_spinbox_create(cont);
+    lv_spinbox_set_range(offset_spinbox, -90, 90);
+    lv_spinbox_set_value(offset_spinbox, 0);
+    lv_spinbox_set_digit_format(offset_spinbox, 2, 0);
+    lv_obj_set_width(offset_spinbox, 200);
 
-       // Button
-       lv_obj_t * btn = lv_btn_create(config_screen);
-       lv_obj_set_size(btn, 300, 60);
-       lv_obj_align(btn, LV_ALIGN_TOP_LEFT, 100, 70 + i * 80);
-       lv_obj_t * btn_label = lv_label_create(btn);
-       lv_label_set_text(btn_label, CONFIG[i].item);
-       lv_obj_set_style_text_font(btn_label, &lv_font_montserrat_24, 0);
+    // config page icon
+    lv_obj_t * config_icon = lv_img_create(config_page);
+    lv_img_set_src(config_icon, &normal_mode_icon);
+    lv_obj_align(config_icon, LV_ALIGN_BOTTOM_MID, 0, 20);
 
-       // You can add event callbacks for config items here
-   }
+    // gait page
+    lv_obj_t * gait_page = lv_menu_page_create(menu, "Gait");
+    cont = lv_menu_cont_create(gait_page);
+    lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_ROW);
+    lv_obj_set_flex_align(cont, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
 
-   lv_scr_load(config_screen); 
-}
+    label = lv_label_create(cont);
+    lv_label_set_text(label, "Gait Type");
 
-void modePage() {
-    // Implement mode page similarly to configPage()
-}
+    lv_obj_t * gait_dd = lv_dropdown_create(cont);
+    lv_dropdown_set_options(gait_dd, "Tripod\nRipple\nWave");
+    lv_dropdown_set_selected(gait_dd, 0);
+    lv_obj_set_width(gait_dd, 200);
 
-void gaitPage() {
-    // Implement gait page similarly to configPage()
-}
+    // mode page
+    lv_obj_t * mode_page = lv_menu_page_create(menu, "Mode");
+    cont = lv_menu_cont_create(mode_page);
+    lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_ROW);
+    lv_obj_set_flex_align(cont, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
 
-void animationPage() {
-    // Implement animation page similarly to configPage()
-}
+    label = lv_label_create(cont);
+    lv_label_set_text(label, "Mode Type");
 
-void legPage() {
-    // Implement leg page similarly to configPage()
-}
+    lv_obj_t * mode_dd = lv_dropdown_create(cont);
+    lv_dropdown_set_options(mode_dd, "Normal\nStrafe\nTilt\nConfig");
+    lv_dropdown_set_selected(mode_dd, 0);
+    lv_obj_set_width(mode_dd, 200);
 
-void jointPage() {
-    // Implement joint page similarly to configPage()
-}
+    // main menu
+    lv_obj_t * main_menu = lv_menu_page_create(menu, "Main Menu");
+    cont = lv_menu_cont_create(main_menu);
+    label = lv_label_create(cont);
+    lv_label_set_text(label, "Config");
+    lv_menu_set_load_page_event(menu, cont, config_page);
 
-void pushState(int currentState) {
-  if (stackIndex < STATE_STACK_MAX) {stateStack[stackIndex++] = { currentState};}
-}
+    cont = lv_menu_cont_create(main_menu);
+    label = lv_label_create(cont);
+    lv_label_set_text(label, "Gait");
+    lv_menu_set_load_page_event(menu, cont, gait_page);
 
-StateStack popState() {
-  if (stackIndex > 0) {return stateStack[--stackIndex];}
-  return { 0, 0 };  // Default fallback
-}
+    cont = lv_menu_cont_create(main_menu);
+    label = lv_label_create(cont);
+    lv_label_set_text(label, "Mode");
+    lv_menu_set_load_page_event(menu, cont, mode_page);
 
-void backPage() {
-	StateStack restored = popState();
-	currentState = restored.state;
+    lv_menu_set_page(menu, main_menu);
 }

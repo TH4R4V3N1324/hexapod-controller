@@ -2,6 +2,7 @@
 #define MENU_H
 
 #include "LVGL_Driver.h"
+#include "Bitmap.h"
 #define STATE_STACK_MAX 10
 
 #ifdef __cplusplus
@@ -48,18 +49,8 @@ enum Joints {coxa, femur, tibia};
 enum Gaits {GAIT_TRIPOD, GAIT_RIPPLE, GAIT_WAVE, NUM_GAITS};
 enum Modes {MODE_NORMAL, MODE_STRAFE, MODE_TILT, MODE_CONFIG, NUM_MODES};
 
-
-void pushState(int currentState);
-struct StateStack popState();
-void backPage();
 void homePage();
-void mainMenu();
-void configPage();
-void modePage();
-void gaitPage();
-void animationPage();
-void legPage();
-void jointPage();
+void menuPage();
 
 #ifdef __cplusplus
 }
