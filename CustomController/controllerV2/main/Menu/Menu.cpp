@@ -109,7 +109,7 @@ void menuPage() {
     lv_obj_t * menu = lv_menu_create(lv_scr_act());
     lv_menu_set_mode_root_back_btn(menu, LV_MENU_ROOT_BACK_BTN_ENABLED);
     lv_obj_add_event_cb(menu, back_btn_event_cb, LV_EVENT_CLICKED, menu);
-    lv_obj_set_size(menu, 480, 640);
+    lv_obj_set_size(menu, lv_disp_get_hor_res(NULL), lv_disp_get_ver_res(NULL));
     lv_obj_center(menu);
     lv_obj_set_style_bg_color(menu, lv_color_black(), 0);
     lv_obj_set_style_text_color(menu, lv_color_white(), 0);
@@ -141,7 +141,7 @@ void menuPage() {
 
     // spacer to push icon down
     lv_obj_t * spacer = lv_obj_create(config_page);
-    lv_obj_set_size(spacer, 10, 80); // width doesn't matter, height sets spacing
+    lv_obj_set_size(spacer, 10, 40); // width doesn't matter, height sets spacing
     lv_obj_set_style_bg_opa(spacer, LV_OPA_TRANSP, 0);
     lv_obj_set_style_border_width(spacer, 0, 0);
     lv_obj_clear_flag(spacer, LV_OBJ_FLAG_SCROLLABLE);
@@ -151,6 +151,15 @@ void menuPage() {
     lv_obj_t * config_icon = lv_img_create(config_page);
     lv_img_set_src(config_icon, &normal_mode_icon);
     lv_obj_align_to(config_icon, cont, LV_ALIGN_OUT_BOTTOM_MID, 0, 0);
+
+    // apply button
+    lv_obj_t * apply_btn = lv_btn_create(config_page);
+    lv_obj_set_size(apply_btn, 120, 60);
+    lv_obj_align_to(apply_btn, config_icon, LV_ALIGN_OUT_BOTTOM_LEFT, 10, 10);
+    lv_obj_t * apply_label = lv_label_create(apply_btn);
+    lv_label_set_text(apply_label, "Apply");
+    lv_obj_set_style_text_font(apply_label, &lv_font_montserrat_24, 0);
+    lv_obj_center(apply_label);
 
     // gait page
     lv_obj_t * gait_page = lv_menu_page_create(menu, "Gait");
