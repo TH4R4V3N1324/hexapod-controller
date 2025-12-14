@@ -12,7 +12,6 @@
 #include "LVGL_Example.h"
 #include "Wireless.h"
 #include "BAT_Driver.h"
-#include "normal_mode_icon.c"
 #include "Menu.h"
 
 void Driver_Loop(void *parameter)
