@@ -14,6 +14,7 @@ idf_component_register(
           "Buzzer/Buzzer.c"
           "BAT_Driver/BAT_Driver.c"
           "Bitmaps/normal_mode_icon.c"
+          "Menu/Menu.cpp"
 
     INCLUDE_DIRS "./EXIO"
                  "./LCD_Driver"
@@ -29,5 +30,6 @@ idf_component_register(
                  "./Buzzer"
                  "./BAT_Driver"
                  "./Bitmaps"
+                 "./Menu"
                  "."
 )

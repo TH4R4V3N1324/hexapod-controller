@@ -9,11 +9,11 @@
 #include "ST7701S.h"
 #include "GT911.h"
 #include "SD_MMC.h"
-#include "LVGL_Driver.h"
 #include "LVGL_Example.h"
 #include "Wireless.h"
 #include "BAT_Driver.h"
 #include "normal_mode_icon.c"
+#include "Menu.h"
 
 void Driver_Loop(void *parameter)
 {
@@ -81,14 +81,14 @@ void test(){
         icons[i] = lv_label_create(scr);
         lv_label_set_text(icons[i], LV_SYMBOL_SETTINGS); // Example icon
         lv_obj_set_style_text_color(icons[i], lv_color_white(), 0);
-        lv_obj_align(icons[i], LV_ALIGN_TOP_LEFT, 30, 70 + i * 80);
-
+        lv_obj_align(icons[i], LV_ALIGN_TOP_LEFT, 30, 80 + i * 80);
+        
         // Label
         labels[i] = lv_label_create(scr);
         lv_label_set_text(labels[i], items[i]);
         lv_obj_set_style_text_color(labels[i], lv_color_white(), 0);
         lv_obj_set_style_text_font(labels[i], &lv_font_montserrat_40, 0);
-        lv_obj_align(labels[i], LV_ALIGN_TOP_LEFT, 120, 70 + i * 80);
+        lv_obj_align(labels[i], LV_ALIGN_TOP_LEFT, 120, 80 + i * 80);
     }
 
     // Highlight "Gait"
@@ -99,9 +99,7 @@ void test(){
     lv_obj_set_style_border_width(highlight, 5, 0);
     lv_obj_align(highlight, LV_ALIGN_TOP_LEFT, 10, 60 + 1 * 80); // 1 = "Gait"
     lv_obj_move_background(highlight); // Put highlight behind text/icons
-
 }
-
 
 void app_main(void)
 {   
@@ -112,9 +110,8 @@ void app_main(void)
     SD_Init();
     LVGL_Init();
     lv_obj_set_style_bg_color(lv_scr_act(), lv_color_black(), LV_PART_MAIN);
-    //show_bitmap_example(lv_scr_act());
-    test();
-    
+    homePage();
+
     while (1) {
         vTaskDelay(pdMS_TO_TICKS(10));
         lv_timer_handler();
