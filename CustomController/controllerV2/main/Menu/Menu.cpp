@@ -169,7 +169,12 @@ void menuPage() {
     lv_label_set_text(label, "Gait Type");
 
     lv_obj_t * gait_dd = lv_dropdown_create(cont);
-    lv_dropdown_set_options(gait_dd, "Tripod\nRipple\nWave");
+    char gait_options[128] = "";
+    for (int i = 0; i < GAIT_SIZE; i++) {
+        strcat(gait_options, GAIT[i].item);
+        if (i < GAIT_SIZE - 1) strcat(gait_options, "\n");
+    }
+    lv_dropdown_set_options(gait_dd, gait_options);
     lv_dropdown_set_selected(gait_dd, 0);
     lv_obj_set_width(gait_dd, 200);
 
@@ -183,7 +188,12 @@ void menuPage() {
     lv_label_set_text(label, "Mode Type");
 
     lv_obj_t * mode_dd = lv_dropdown_create(cont);
-    lv_dropdown_set_options(mode_dd, "Normal\nStrafe\nTilt\nConfig");
+    char mode_options[128] = "";
+    for (int i = 0; i < MODE_SIZE; i++) {
+        strcat(mode_options, MODE[i].item);
+        if (i < MODE_SIZE - 1) strcat(mode_options, "\n");
+    }
+    lv_dropdown_set_options(mode_dd, mode_options);
     lv_dropdown_set_selected(mode_dd, 0);
     lv_obj_set_width(mode_dd, 200);
 
