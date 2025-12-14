@@ -69,6 +69,25 @@ static void back_btn_event_cb(lv_event_t *e) {
     }
 }
 
+void create_dropdown(page * items, int size, lv_obj_t * parent, const char * label_text) {
+    lv_obj_t * cont = lv_menu_cont_create(parent);
+    lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_ROW);
+    lv_obj_set_flex_align(cont, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+
+    lv_obj_t * label = lv_label_create(cont);
+    lv_label_set_text(label, label_text);
+
+    lv_obj_t * dd = lv_dropdown_create(cont);
+    char options[128] = "";
+    for (int i = 0; i < size; i++) {
+        strcat(options, items[i].item);
+        if (i < size - 1) strcat(options, "\n");
+    }
+    lv_dropdown_set_options(dd, options);
+    lv_dropdown_set_selected(dd, 0);
+    lv_obj_set_width(dd, 200);
+}
+
 void homePage() {
     lv_obj_t * home_screen = lv_obj_create(NULL);
     lv_obj_set_style_bg_color(home_screen, lv_color_black(), 0);
@@ -103,42 +122,8 @@ void menuPage() {
 
     // config page
     lv_obj_t * config_page = lv_menu_page_create(menu, "Config");
-
-    // leg selection
-    cont = lv_menu_cont_create(config_page);
-    lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_ROW);
-    lv_obj_set_flex_align(cont, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-
-    label = lv_label_create(cont); 
-    lv_label_set_text(label, "Leg");
-
-    lv_obj_t * leg_dd = lv_dropdown_create(cont);
-    char leg_options[128] = "";
-    for (int i = 0; i < CONFIG_SIZE; i++) {
-        strcat(leg_options, CONFIG[i].item);
-        if (i < CONFIG_SIZE - 1) strcat(leg_options, "\n");
-    }
-    lv_dropdown_set_options(leg_dd, leg_options);
-    lv_dropdown_set_selected(leg_dd, 0);
-    lv_obj_set_width(leg_dd, 200);
-
-    // joint selection
-    cont = lv_menu_cont_create(config_page);
-    lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_ROW);
-    lv_obj_set_flex_align(cont, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-
-    label = lv_label_create(cont);
-    lv_label_set_text(label, "Joint");
-
-    lv_obj_t * joint_dd = lv_dropdown_create(cont);
-    char joint_options[128] = "";
-    for (int i = 0; i < LEG_SIZE; i++) {
-        strcat(joint_options, LEG[i].item);
-        if (i < LEG_SIZE - 1) strcat(joint_options, "\n");
-    }
-    lv_dropdown_set_options(joint_dd, joint_options);
-    lv_dropdown_set_selected(joint_dd, 0);
-    lv_obj_set_width(joint_dd, 200);
+    create_dropdown(CONFIG, CONFIG_SIZE, config_page, "Leg"); // leg selection
+    create_dropdown(LEG, LEG_SIZE, config_page, "Joint"); // joint selection
 
     // offset selection
     cont = lv_menu_cont_create(config_page);
@@ -161,41 +146,11 @@ void menuPage() {
 
     // gait page
     lv_obj_t * gait_page = lv_menu_page_create(menu, "Gait");
-    cont = lv_menu_cont_create(gait_page);
-    lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_ROW);
-    lv_obj_set_flex_align(cont, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-
-    label = lv_label_create(cont);
-    lv_label_set_text(label, "Gait Type");
-
-    lv_obj_t * gait_dd = lv_dropdown_create(cont);
-    char gait_options[128] = "";
-    for (int i = 0; i < GAIT_SIZE; i++) {
-        strcat(gait_options, GAIT[i].item);
-        if (i < GAIT_SIZE - 1) strcat(gait_options, "\n");
-    }
-    lv_dropdown_set_options(gait_dd, gait_options);
-    lv_dropdown_set_selected(gait_dd, 0);
-    lv_obj_set_width(gait_dd, 200);
+    create_dropdown(GAIT, GAIT_SIZE, gait_page, "Gait Type");
 
     // mode page
     lv_obj_t * mode_page = lv_menu_page_create(menu, "Mode");
-    cont = lv_menu_cont_create(mode_page);
-    lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_ROW);
-    lv_obj_set_flex_align(cont, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-
-    label = lv_label_create(cont);
-    lv_label_set_text(label, "Mode Type");
-
-    lv_obj_t * mode_dd = lv_dropdown_create(cont);
-    char mode_options[128] = "";
-    for (int i = 0; i < MODE_SIZE; i++) {
-        strcat(mode_options, MODE[i].item);
-        if (i < MODE_SIZE - 1) strcat(mode_options, "\n");
-    }
-    lv_dropdown_set_options(mode_dd, mode_options);
-    lv_dropdown_set_selected(mode_dd, 0);
-    lv_obj_set_width(mode_dd, 200);
+    create_dropdown(MODE, MODE_SIZE, mode_page, "Mode Type");
 
     // main menu
     lv_obj_t * main_menu = lv_menu_page_create(menu, "Main Menu");
