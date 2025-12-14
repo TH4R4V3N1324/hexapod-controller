@@ -139,10 +139,18 @@ void menuPage() {
     lv_spinbox_set_digit_format(offset_spinbox, 2, 0);
     lv_obj_set_width(offset_spinbox, 200);
 
+    // spacer to push icon down
+    lv_obj_t * spacer = lv_obj_create(config_page);
+    lv_obj_set_size(spacer, 10, 80); // width doesn't matter, height sets spacing
+    lv_obj_set_style_bg_opa(spacer, LV_OPA_TRANSP, 0);
+    lv_obj_set_style_border_width(spacer, 0, 0);
+    lv_obj_clear_flag(spacer, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_align_to(spacer, cont, LV_ALIGN_OUT_BOTTOM_MID, 0, 0);
+
     // config page icon
     lv_obj_t * config_icon = lv_img_create(config_page);
     lv_img_set_src(config_icon, &normal_mode_icon);
-    lv_obj_align(config_icon, LV_ALIGN_BOTTOM_MID, 0, 20);
+    lv_obj_align_to(config_icon, cont, LV_ALIGN_OUT_BOTTOM_MID, 0, 0);
 
     // gait page
     lv_obj_t * gait_page = lv_menu_page_create(menu, "Gait");
