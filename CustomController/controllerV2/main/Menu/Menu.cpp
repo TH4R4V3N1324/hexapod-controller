@@ -51,10 +51,6 @@ page ANIMATION[] = {
 };
 const int ANIMATION_SIZE = sizeof(ANIMATION) / sizeof(ANIMATION[0]);
 
-static void menu_btn_event_cb(lv_event_t *e) {
-    menuPage();
-}
-
 static void back_btn_event_cb(lv_event_t *e) {
     lv_obj_t * obj = lv_event_get_target(e);
     lv_obj_t * menu = (lv_obj_t *)lv_event_get_user_data(e);
@@ -110,7 +106,7 @@ void homePage() {
     lv_label_set_text(menu_label, "Menu");
     lv_obj_set_style_text_font(menu_label, &lv_font_montserrat_24, 0);
 
-    lv_obj_add_event_cb(menu_btn, menu_btn_event_cb, LV_EVENT_CLICKED, NULL);
+    lv_obj_add_event_cb(menu_btn, [](lv_event_t * e){ menuPage(); }, LV_EVENT_CLICKED, NULL);
 
     lv_scr_load(home_screen);
 }
