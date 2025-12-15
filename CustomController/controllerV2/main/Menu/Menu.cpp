@@ -109,12 +109,21 @@ void add_menu_item(lv_obj_t * menu, lv_obj_t * page, struct page item) {
 void homePage() {
     lv_theme_default_init(NULL, lv_palette_main(LV_PALETTE_BLUE), lv_palette_main(LV_PALETTE_RED), true, &lv_font_montserrat_32);
 
-    static lv_coord_t col_dsc[] = { 
+    lv_obj_t * home_screen = lv_obj_create(NULL);
+    lv_obj_set_size(home_screen, lv_disp_get_hor_res(NULL), lv_disp_get_ver_res(NULL));
+
+    static lv_style_t home_style;
+    lv_style_init(&home_style);
+    lv_style_set_text_font(&home_style, &lv_font_montserrat_16); // or your enabled 16px font
+
+    lv_obj_add_style(home_screen, &home_style, 0);
+
+    static lv_coord_t col_home[] = { 
         LV_GRID_FR(1), 
         LV_GRID_TEMPLATE_LAST 
     };
 
-    static lv_coord_t row_dsc[] = {
+    static lv_coord_t row_home[] = {
         60,   // status bar
         110,  // gait/state
         260,  // visualization
@@ -123,12 +132,10 @@ void homePage() {
         LV_GRID_TEMPLATE_LAST
     };
 
-    lv_obj_t * home_screen = lv_obj_create(NULL);
-    lv_obj_set_size(home_screen, lv_disp_get_hor_res(NULL), lv_disp_get_ver_res(NULL));
     lv_obj_set_layout(home_screen, LV_LAYOUT_GRID);
-    lv_obj_set_grid_dsc_array(home_screen, col_dsc, row_dsc);
+    lv_obj_set_grid_dsc_array(home_screen, col_home, row_home);
 
-    // Status Bar
+    /* Status Bar */
     lv_obj_t * status_bar = lv_obj_create(home_screen);
     lv_obj_set_grid_cell(
         status_bar,
@@ -136,16 +143,22 @@ void homePage() {
         LV_GRID_ALIGN_STRETCH, 0, 1     // row
     );
 
-    for (int i = 0; i < 4; i++) {
-        lv_obj_t * tile = lv_obj_create(status_bar);
-        lv_obj_set_grid_cell(
-            tile,
-            LV_GRID_ALIGN_STRETCH, i, 1,    // column
-            LV_GRID_ALIGN_STRETCH, 0, 1     // row
-        );
-    }
+    static lv_coord_t cols_status_bar[] = {
+        LV_GRID_FR(1),
+        LV_GRID_FR(1), 
+        LV_GRID_FR(1), 
+        LV_GRID_TEMPLATE_LAST
+    };
 
-    // Gait/State Panel
+    static lv_coord_t rows_status_bar[] = {
+        LV_GRID_FR(1),
+        LV_GRID_TEMPLATE_LAST
+    };
+
+    lv_obj_set_layout(status_bar, LV_LAYOUT_GRID);
+    lv_obj_set_grid_dsc_array(status_bar, cols_status_bar, rows_status_bar);
+
+    /* State Panel */
     lv_obj_t * state_panel = lv_obj_create(home_screen);
     lv_obj_set_grid_cell(
         state_panel,
@@ -153,7 +166,22 @@ void homePage() {
         LV_GRID_ALIGN_STRETCH, 1, 1     // row
     );
 
-    // Visualization Panel
+    static lv_coord_t cols_state_panel[] = {
+        LV_GRID_FR(1),
+        LV_GRID_TEMPLATE_LAST
+    };
+
+    static lv_coord_t rows_state_panel[] = {
+        LV_GRID_FR(1),
+        LV_GRID_FR(1),
+        LV_GRID_FR(1),
+        LV_GRID_TEMPLATE_LAST
+    };
+
+    lv_obj_set_layout(state_panel, LV_LAYOUT_GRID);
+    lv_obj_set_grid_dsc_array(state_panel, cols_state_panel, rows_state_panel);
+
+    /* Visualization Panel */
     lv_obj_t * visualization_panel = lv_obj_create(home_screen);
     lv_obj_set_grid_cell(
         visualization_panel,
@@ -161,7 +189,7 @@ void homePage() {
         LV_GRID_ALIGN_STRETCH, 2, 1     // row
     );
     
-    // Info Tiles
+    /* Info Tiles */
     lv_obj_t * info_tiles = lv_obj_create(home_screen);
     lv_obj_set_grid_cell(
         info_tiles,
@@ -169,21 +197,57 @@ void homePage() {
         LV_GRID_ALIGN_STRETCH, 3, 1     // row
     );
 
-    // Action Bar
-    lv_obj_t * action_bar = lv_obj_create(home_screen);    
+    static lv_coord_t cols_info_tiles[] = {
+        LV_GRID_FR(1),
+        LV_GRID_FR(1),
+        LV_GRID_FR(1),
+        LV_GRID_TEMPLATE_LAST
+    };
+
+    static lv_coord_t rows_info_tiles[] = {
+        LV_GRID_FR(1),
+        LV_GRID_FR(1),
+        LV_GRID_TEMPLATE_LAST
+    };
+
+    lv_obj_set_layout(info_tiles, LV_LAYOUT_GRID);
+    lv_obj_set_grid_dsc_array(info_tiles, cols_info_tiles, rows_info_tiles);
+
+    /* Action Bar */
+    lv_obj_t * action_bar = lv_obj_create(home_screen);   
+    lv_obj_clear_flag(action_bar, LV_OBJ_FLAG_SCROLLABLE); 
     lv_obj_set_grid_cell(
         action_bar,
         LV_GRID_ALIGN_STRETCH, 0, 1,    // column
         LV_GRID_ALIGN_STRETCH, 4, 1     // row
     );
 
+    static lv_coord_t cols_action_bar[] = {
+        LV_GRID_FR(1),
+        LV_GRID_FR(1),
+        LV_GRID_FR(1),
+        LV_GRID_TEMPLATE_LAST
+    };
+
+    static lv_coord_t rows_action_bar[] = {
+        LV_GRID_FR(1),
+        LV_GRID_TEMPLATE_LAST
+    };
+
+    lv_obj_set_layout(action_bar, LV_LAYOUT_GRID);
+    lv_obj_set_grid_dsc_array(action_bar, cols_action_bar, rows_action_bar);
+
     lv_obj_t *menu_btn = lv_btn_create(action_bar);
-    lv_obj_set_size(menu_btn, 100, 50);
-    lv_obj_align(menu_btn, LV_ALIGN_LEFT_MID, 0, 0);
+
+    lv_obj_set_grid_cell(
+        menu_btn,
+        LV_GRID_ALIGN_CENTER, 0, 1,    // column
+        LV_GRID_ALIGN_CENTER, 0, 1     // row
+    );
+
     lv_obj_t *menu_label = lv_label_create(menu_btn);
     lv_obj_align(menu_label, LV_ALIGN_CENTER, 0, 0);
     lv_label_set_text(menu_label, "Menu");
-    lv_obj_set_style_text_font(menu_label, &lv_font_montserrat_16, 0);
 
     lv_obj_add_event_cb(menu_btn, [](lv_event_t * e){ menuPage(); }, LV_EVENT_CLICKED, NULL);
 
