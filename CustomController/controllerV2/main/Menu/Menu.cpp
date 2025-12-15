@@ -109,16 +109,81 @@ void add_menu_item(lv_obj_t * menu, lv_obj_t * page, struct page item) {
 void homePage() {
     lv_theme_default_init(NULL, lv_palette_main(LV_PALETTE_BLUE), lv_palette_main(LV_PALETTE_RED), true, &lv_font_montserrat_32);
 
-    lv_obj_t * home_screen = lv_obj_create(NULL);
-    lv_obj_set_style_bg_color(home_screen, lv_color_black(), 0);
+    static lv_coord_t col_dsc[] = { 
+        LV_GRID_FR(1), 
+        LV_GRID_TEMPLATE_LAST 
+    };
 
-    lv_obj_t *menu_btn = lv_btn_create(home_screen);
-    lv_obj_set_size(menu_btn, 120, 60);
-    lv_obj_align(menu_btn, LV_ALIGN_BOTTOM_LEFT, 10, -10);
+    static lv_coord_t row_dsc[] = {
+        60,   // status bar
+        110,  // gait/state
+        260,  // visualization
+        110,  // info tiles
+        60,   // action bar
+        LV_GRID_TEMPLATE_LAST
+    };
+
+    lv_obj_t * home_screen = lv_obj_create(NULL);
+    lv_obj_set_size(home_screen, lv_disp_get_hor_res(NULL), lv_disp_get_ver_res(NULL));
+    lv_obj_set_layout(home_screen, LV_LAYOUT_GRID);
+    lv_obj_set_grid_dsc_array(home_screen, col_dsc, row_dsc);
+
+    // Status Bar
+    lv_obj_t * status_bar = lv_obj_create(home_screen);
+    lv_obj_set_grid_cell(
+        status_bar,
+        LV_GRID_ALIGN_STRETCH, 0, 1,    // column
+        LV_GRID_ALIGN_STRETCH, 0, 1     // row
+    );
+
+    for (int i = 0; i < 4; i++) {
+        lv_obj_t * tile = lv_obj_create(status_bar);
+        lv_obj_set_grid_cell(
+            tile,
+            LV_GRID_ALIGN_STRETCH, i, 1,    // column
+            LV_GRID_ALIGN_STRETCH, 0, 1     // row
+        );
+    }
+
+    // Gait/State Panel
+    lv_obj_t * state_panel = lv_obj_create(home_screen);
+    lv_obj_set_grid_cell(
+        state_panel,
+        LV_GRID_ALIGN_STRETCH, 0, 1,    // column
+        LV_GRID_ALIGN_STRETCH, 1, 1     // row
+    );
+
+    // Visualization Panel
+    lv_obj_t * visualization_panel = lv_obj_create(home_screen);
+    lv_obj_set_grid_cell(
+        visualization_panel,
+        LV_GRID_ALIGN_STRETCH, 0, 1,    // column
+        LV_GRID_ALIGN_STRETCH, 2, 1     // row
+    );
+    
+    // Info Tiles
+    lv_obj_t * info_tiles = lv_obj_create(home_screen);
+    lv_obj_set_grid_cell(
+        info_tiles,
+        LV_GRID_ALIGN_STRETCH, 0, 1,    // column
+        LV_GRID_ALIGN_STRETCH, 3, 1     // row
+    );
+
+    // Action Bar
+    lv_obj_t * action_bar = lv_obj_create(home_screen);    
+    lv_obj_set_grid_cell(
+        action_bar,
+        LV_GRID_ALIGN_STRETCH, 0, 1,    // column
+        LV_GRID_ALIGN_STRETCH, 4, 1     // row
+    );
+
+    lv_obj_t *menu_btn = lv_btn_create(action_bar);
+    lv_obj_set_size(menu_btn, 100, 50);
+    lv_obj_align(menu_btn, LV_ALIGN_LEFT_MID, 0, 0);
     lv_obj_t *menu_label = lv_label_create(menu_btn);
     lv_obj_align(menu_label, LV_ALIGN_CENTER, 0, 0);
     lv_label_set_text(menu_label, "Menu");
-    lv_obj_set_style_text_font(menu_label, &lv_font_montserrat_24, 0);
+    lv_obj_set_style_text_font(menu_label, &lv_font_montserrat_16, 0);
 
     lv_obj_add_event_cb(menu_btn, [](lv_event_t * e){ menuPage(); }, LV_EVENT_CLICKED, NULL);
 
