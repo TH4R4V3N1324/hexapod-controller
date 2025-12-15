@@ -95,6 +95,8 @@ void add_menu_item(lv_obj_t * menu, lv_obj_t * page, struct page item) {
 }
 
 void homePage() {
+    lv_theme_default_init(NULL, lv_palette_main(LV_PALETTE_BLUE), lv_palette_main(LV_PALETTE_RED), true, &lv_font_montserrat_32);
+
     lv_obj_t * home_screen = lv_obj_create(NULL);
     lv_obj_set_style_bg_color(home_screen, lv_color_black(), 0);
 
@@ -117,11 +119,7 @@ void menuPage() {
     lv_obj_add_event_cb(menu, back_btn_event_cb, LV_EVENT_CLICKED, menu);
     lv_obj_set_size(menu, lv_disp_get_hor_res(NULL), lv_disp_get_ver_res(NULL));
     lv_obj_center(menu);
-    lv_obj_set_style_bg_color(menu, lv_color_black(), 0);
-    lv_obj_set_style_text_color(menu, lv_color_white(), 0);
-    lv_obj_set_style_text_font(menu, &lv_font_montserrat_32, 0);
-    lv_obj_set_style_text_color(lv_menu_get_main_header_back_btn(menu), lv_color_white(), 0);
-
+    lv_obj_set_style_text_font(menu, lv_theme_get_font_normal(NULL), 0);
 
     lv_obj_t * cont;
     lv_obj_t * label;
