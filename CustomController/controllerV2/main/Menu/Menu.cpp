@@ -6,7 +6,12 @@ lv_obj_t *mode_page = NULL;
 lv_obj_t *debug_page = NULL;
 
 static lv_timer_t * auto_step_timer;
-lv_obj_t *BAT_Volts;
+lv_obj_t * SD_Size;
+lv_obj_t * FlashSize;
+lv_obj_t * BAT_Volts;
+lv_obj_t * Board_angle;
+lv_obj_t * RTC_Time;
+lv_obj_t * Wireless_Scan;
 
 page MENU[] = {
     {"Config", LV_SYMBOL_SETTINGS, nullptr, &config_page, nullptr},
@@ -65,6 +70,8 @@ static void back_btn_event_cb(lv_event_t *e) {
     }
 }
 
+static void ta_event_cb(lv_event_t * e) {}
+
 void create_dropdown(page * items, int size, lv_obj_t * parent, const char * label_text) {
     lv_obj_t * cont = lv_menu_cont_create(parent);
     lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_ROW);
@@ -116,6 +123,109 @@ void homePage() {
     lv_obj_add_event_cb(menu_btn, [](lv_event_t * e){ menuPage(); }, LV_EVENT_CLICKED, NULL);
 
     lv_scr_load(home_screen);
+}
+
+void debugPage(lv_obj_t * parent) {
+    lv_obj_t * cont;
+    lv_obj_t * label;
+
+    debug_page = lv_menu_page_create(parent, "DEBUG");
+
+    // SD Card info
+    cont = lv_menu_cont_create(debug_page);
+    lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_ROW);
+    lv_obj_set_flex_align(cont, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+
+    lv_obj_t * SD_label = lv_label_create(cont);
+    lv_label_set_text(SD_label, "SD Card");
+
+    SD_Size = lv_textarea_create(cont);
+    lv_textarea_set_one_line(SD_Size, true);
+    lv_textarea_set_placeholder_text(SD_Size, "SD Size");
+    lv_obj_add_event_cb(SD_Size, ta_event_cb, LV_EVENT_ALL, NULL);
+
+    lv_obj_set_style_text_font(SD_label, &lv_font_montserrat_24, 0);
+    lv_obj_set_style_text_font(SD_Size, &lv_font_montserrat_24, 0);
+
+    // Flash info
+    cont = lv_menu_cont_create(debug_page);
+    lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_ROW);
+    lv_obj_set_flex_align(cont, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+
+    lv_obj_t * Flash_label = lv_label_create(cont);
+    lv_label_set_text(Flash_label, "Flash Size");
+
+    FlashSize = lv_textarea_create(cont);
+    lv_textarea_set_one_line(FlashSize, true);
+    lv_textarea_set_placeholder_text(FlashSize, "Flash Size");
+    lv_obj_add_event_cb(FlashSize, ta_event_cb, LV_EVENT_ALL, NULL);
+
+    lv_obj_set_style_text_font(Flash_label, &lv_font_montserrat_24, 0);
+    lv_obj_set_style_text_font(FlashSize, &lv_font_montserrat_24, 0);
+
+    // Battery voltage info
+    cont = lv_menu_cont_create(debug_page);
+    lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_ROW);
+    lv_obj_set_flex_align(cont, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+
+    lv_obj_t * BAT_label = lv_label_create(cont);
+    lv_label_set_text(BAT_label, "Battery");
+
+    BAT_Volts = lv_textarea_create(cont);
+    lv_textarea_set_one_line(BAT_Volts, true);
+    lv_textarea_set_placeholder_text(BAT_Volts, "BAT Volts");
+    lv_obj_add_event_cb(BAT_Volts, ta_event_cb, LV_EVENT_ALL, NULL);
+
+    lv_obj_set_style_text_font(BAT_label, &lv_font_montserrat_24, 0);
+    lv_obj_set_style_text_font(BAT_Volts, &lv_font_montserrat_24, 0);
+
+    // Board angle info
+    cont = lv_menu_cont_create(debug_page);
+    lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_ROW);
+    lv_obj_set_flex_align(cont, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+
+    lv_obj_t * angle_label = lv_label_create(cont);
+    lv_label_set_text(angle_label, "IMU Angle");
+
+    Board_angle = lv_textarea_create(cont);
+    lv_textarea_set_one_line(Board_angle, true);
+    lv_textarea_set_placeholder_text(Board_angle, "Board angle");
+    lv_obj_add_event_cb(Board_angle, ta_event_cb, LV_EVENT_ALL, NULL);
+
+    lv_obj_set_style_text_font(angle_label, &lv_font_montserrat_24, 0);
+    lv_obj_set_style_text_font(Board_angle, &lv_font_montserrat_24, 0);
+
+    // RTC Time info
+    cont = lv_menu_cont_create(debug_page);
+    lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_ROW);
+    lv_obj_set_flex_align(cont, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+
+    lv_obj_t * Time_label = lv_label_create(cont);
+    lv_label_set_text(Time_label, "RTC Time");
+
+    RTC_Time = lv_textarea_create(cont);
+    lv_textarea_set_one_line(RTC_Time, true);
+    lv_textarea_set_placeholder_text(RTC_Time, "Display time");
+    lv_obj_add_event_cb(RTC_Time, ta_event_cb, LV_EVENT_ALL, NULL);
+
+    lv_obj_set_style_text_font(Time_label, &lv_font_montserrat_24, 0);
+    lv_obj_set_style_text_font(RTC_Time, &lv_font_montserrat_24, 0);
+
+    // Wireless scan info
+    cont = lv_menu_cont_create(debug_page);
+    lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_ROW);
+    lv_obj_set_flex_align(cont, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+
+    lv_obj_t * Wireless_label = lv_label_create(cont);
+    lv_label_set_text(Wireless_label, "Wireless");
+
+    Wireless_Scan = lv_textarea_create(cont);
+    lv_textarea_set_one_line(Wireless_Scan, true);
+    lv_textarea_set_placeholder_text(Wireless_Scan, "Wireless number");
+    lv_obj_add_event_cb(Wireless_Scan, ta_event_cb, LV_EVENT_ALL, NULL);
+
+    lv_obj_set_style_text_font(Wireless_label, &lv_font_montserrat_24, 0);
+    lv_obj_set_style_text_font(Wireless_Scan, &lv_font_montserrat_24, 0);
 }
 
 void menuPage() {
@@ -171,19 +281,7 @@ void menuPage() {
     lv_obj_center(apply_label);
 
     // debug page
-    debug_page = lv_menu_page_create(menu, "DEBUG");
-
-    cont = lv_menu_cont_create(debug_page);
-    lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_ROW);
-    lv_obj_set_flex_align(cont, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-
-    lv_obj_t * BAT_label = lv_label_create(cont);
-    lv_label_set_text(BAT_label, "Battery Voltage");
-
-    BAT_Volts = lv_textarea_create(cont);
-    lv_textarea_set_one_line(BAT_Volts, true);
-    lv_textarea_set_placeholder_text(BAT_Volts, "BAT Volts");
-    //lv_obj_add_event_cb(BAT_Volts, ta_event_cb, LV_EVENT_ALL, NULL);
+    debugPage(menu);
     
     // gait page
     gait_page = lv_menu_page_create(menu, "Gait");
@@ -205,8 +303,21 @@ void menuPage() {
 }
 
 void display_volts(lv_timer_t * timer){
-    char buf[100];
-
+    char buf[100]; 
+    
+    snprintf(buf, sizeof(buf), "%ld MB\r\n", SDCard_Size);
+    lv_textarea_set_placeholder_text(SD_Size, buf);
+    snprintf(buf, sizeof(buf), "%ld MB\r\n", Flash_Size);
+    lv_textarea_set_placeholder_text(FlashSize, buf);
     snprintf(buf, sizeof(buf), "%.2f V\r\n", BAT_analogVolts);
     lv_textarea_set_placeholder_text(BAT_Volts, buf);
+    snprintf(buf, sizeof(buf), "X:%.2f  Y:%.2f  Z:%.2f\r\n", Accel.x, Accel.y, Accel.z);
+    lv_textarea_set_placeholder_text(Board_angle, buf);
+    snprintf(buf, sizeof(buf), "%d.%d.%d   %d:%d:%d\r\n",datetime.year,datetime.month,datetime.day,datetime.hour,datetime.minute,datetime.second);
+    lv_textarea_set_placeholder_text(RTC_Time, buf);
+    if(Scan_finish)
+        snprintf(buf, sizeof(buf), "WIFI: %d    BLE: %d    ..Scan Finish.\r\n",WIFI_NUM,BLE_NUM);
+    else
+        snprintf(buf, sizeof(buf), "WIFI: %d    BLE: %d\r\n",WIFI_NUM,BLE_NUM);
+    lv_textarea_set_placeholder_text(Wireless_Scan, buf);
 }
