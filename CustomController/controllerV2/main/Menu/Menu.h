@@ -3,6 +3,7 @@
 
 #include "LVGL_Driver.h"
 #include "Bitmap.h"
+#include "BAT_Driver.h"
 #define STATE_STACK_MAX 10
 
 #ifdef __cplusplus
@@ -24,6 +25,7 @@ enum Modes {MODE_NORMAL, MODE_STRAFE, MODE_TILT, MODE_CONFIG, NUM_MODES};
 
 void homePage();
 void menuPage();
+void display_volts(lv_timer_t * timer);
 
 #ifdef __cplusplus
 }

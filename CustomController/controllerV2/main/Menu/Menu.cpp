@@ -3,12 +3,17 @@
 lv_obj_t *config_page = NULL;
 lv_obj_t *gait_page = NULL;
 lv_obj_t *mode_page = NULL;
+lv_obj_t *debug_page = NULL;
+
+static lv_timer_t * auto_step_timer;
+lv_obj_t *BAT_Volts;
 
 page MENU[] = {
     {"Config", LV_SYMBOL_SETTINGS, nullptr, &config_page, nullptr},
     {"Mode", LV_SYMBOL_EDIT, nullptr, &mode_page, nullptr},
     {"Gait", LV_SYMBOL_REFRESH, nullptr, &gait_page, nullptr},
-    {"Animation", LV_SYMBOL_PLAY, nullptr, nullptr, nullptr}
+    {"Animation", LV_SYMBOL_PLAY, nullptr, nullptr, nullptr},
+    {"DEBUG", LV_SYMBOL_WARNING, nullptr, &debug_page, nullptr}
 };
 const int MENU_SIZE = sizeof(MENU) / sizeof(MENU[0]);
 
@@ -165,6 +170,21 @@ void menuPage() {
     lv_obj_set_style_text_font(apply_label, &lv_font_montserrat_24, 0);
     lv_obj_center(apply_label);
 
+    // debug page
+    debug_page = lv_menu_page_create(menu, "DEBUG");
+
+    cont = lv_menu_cont_create(debug_page);
+    lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_ROW);
+    lv_obj_set_flex_align(cont, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+
+    lv_obj_t * BAT_label = lv_label_create(cont);
+    lv_label_set_text(BAT_label, "Battery Voltage");
+
+    BAT_Volts = lv_textarea_create(cont);
+    lv_textarea_set_one_line(BAT_Volts, true);
+    lv_textarea_set_placeholder_text(BAT_Volts, "BAT Volts");
+    //lv_obj_add_event_cb(BAT_Volts, ta_event_cb, LV_EVENT_ALL, NULL);
+    
     // gait page
     gait_page = lv_menu_page_create(menu, "Gait");
     create_dropdown(GAIT, GAIT_SIZE, gait_page, "Gait Type");
@@ -180,4 +200,13 @@ void menuPage() {
     }
 
     lv_menu_set_page(menu, main_menu);
+
+    auto_step_timer = lv_timer_create(display_volts, 100, NULL);
+}
+
+void display_volts(lv_timer_t * timer){
+    char buf[100];
+
+    snprintf(buf, sizeof(buf), "%.2f V\r\n", BAT_analogVolts);
+    lv_textarea_set_placeholder_text(BAT_Volts, buf);
 }

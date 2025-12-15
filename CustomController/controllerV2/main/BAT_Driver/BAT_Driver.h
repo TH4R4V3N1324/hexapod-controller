@@ -17,5 +17,13 @@
 
 extern float BAT_analogVolts;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void BAT_Init(void);
 float BAT_Get_Volts(void);
+
+#ifdef __cplusplus
+}
+#endif
