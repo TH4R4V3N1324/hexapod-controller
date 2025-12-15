@@ -88,6 +88,13 @@ void create_dropdown(page * items, int size, lv_obj_t * parent, const char * lab
     lv_obj_set_width(dd, 200);
 }
 
+void add_menu_item(lv_obj_t * menu, lv_obj_t * page, const char * label_text, lv_obj_t * destination_page) {
+    lv_obj_t * cont = lv_menu_cont_create(page);
+    lv_obj_t * label = lv_label_create(cont);
+    lv_label_set_text(label, label_text);
+    lv_menu_set_load_page_event(menu, cont, destination_page);
+}
+
 void homePage() {
     lv_obj_t * home_screen = lv_obj_create(NULL);
     lv_obj_set_style_bg_color(home_screen, lv_color_black(), 0);
@@ -171,20 +178,10 @@ void menuPage() {
 
     // main menu
     lv_obj_t * main_menu = lv_menu_page_create(menu, "Main Menu");
-    cont = lv_menu_cont_create(main_menu);
-    label = lv_label_create(cont);
-    lv_label_set_text(label, "Config");
-    lv_menu_set_load_page_event(menu, cont, config_page);
-
-    cont = lv_menu_cont_create(main_menu);
-    label = lv_label_create(cont);
-    lv_label_set_text(label, "Gait");
-    lv_menu_set_load_page_event(menu, cont, gait_page);
-
-    cont = lv_menu_cont_create(main_menu);
-    label = lv_label_create(cont);
-    lv_label_set_text(label, "Mode");
-    lv_menu_set_load_page_event(menu, cont, mode_page);
+    add_menu_item(menu, main_menu, "Config", config_page);
+    add_menu_item(menu, main_menu, "Gait", gait_page);
+    add_menu_item(menu, main_menu, "Mode", mode_page);
+    add_menu_item(menu, main_menu, "Animation", NULL);
 
     lv_menu_set_page(menu, main_menu);
 }
