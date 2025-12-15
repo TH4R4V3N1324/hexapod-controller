@@ -1,58 +1,53 @@
 #include "Menu.h"
 
-#include "Menu.h"
-
-// Global state stack and indices definitions
-struct StateStack stateStack[STATE_STACK_MAX];
-int stackTop = -1;
-int stackIndex = 0;
-States currentState = STATE_HOME;
-States previousState = STATE_HOME;
+lv_obj_t *config_page = NULL;
+lv_obj_t *gait_page = NULL;
+lv_obj_t *mode_page = NULL;
 
 page MENU[] = {
-    {"Config", LV_SYMBOL_SETTINGS, STATE_CONFIG},
-    {"Mode", LV_SYMBOL_EDIT, STATE_MODE},
-    {"Gait", LV_SYMBOL_REFRESH, STATE_GAIT},
-    {"Animation", LV_SYMBOL_PLAY, STATE_ANIMATION}
+    {"Config", LV_SYMBOL_SETTINGS, nullptr, &config_page},
+    {"Mode", LV_SYMBOL_EDIT, nullptr, &mode_page},
+    {"Gait", LV_SYMBOL_REFRESH, nullptr, &gait_page},
+    {"Animation", LV_SYMBOL_PLAY}
 };
 const int MENU_SIZE = sizeof(MENU) / sizeof(MENU[0]);
 
 page CONFIG[] = {
-    {"Leg1", LV_SYMBOL_SETTINGS, STATE_LEG},
-    {"Leg2", LV_SYMBOL_SETTINGS, STATE_LEG},
-    {"Leg3", LV_SYMBOL_SETTINGS, STATE_LEG},
-    {"Leg4", LV_SYMBOL_SETTINGS, STATE_LEG},
-    {"Leg5", LV_SYMBOL_SETTINGS, STATE_LEG},
-    {"Leg6", LV_SYMBOL_SETTINGS, STATE_LEG}
+    {"Leg1", LV_SYMBOL_SETTINGS},
+    {"Leg2", LV_SYMBOL_SETTINGS},
+    {"Leg3", LV_SYMBOL_SETTINGS},
+    {"Leg4", LV_SYMBOL_SETTINGS},
+    {"Leg5", LV_SYMBOL_SETTINGS},
+    {"Leg6", LV_SYMBOL_SETTINGS}
 };
 const int CONFIG_SIZE = sizeof(CONFIG) / sizeof(CONFIG[0]);
 
 page GAIT[] = {
-    {"Tripod", LV_SYMBOL_REFRESH, STATE_NONE},
-    {"Ripple", LV_SYMBOL_REFRESH, STATE_NONE},
-    {"Wave", LV_SYMBOL_REFRESH, STATE_NONE}
+    {"Tripod", LV_SYMBOL_REFRESH},
+    {"Ripple", LV_SYMBOL_REFRESH},
+    {"Wave", LV_SYMBOL_REFRESH}
 };
 const int GAIT_SIZE = sizeof(GAIT) / sizeof(GAIT[0]);
 
 page MODE[] = {
-    {"Normal", LV_SYMBOL_EDIT, STATE_NONE},
-    {"Strafe", LV_SYMBOL_EDIT, STATE_NONE},
-    {"Tilt", LV_SYMBOL_EDIT, STATE_NONE},
-    {"Config", LV_SYMBOL_EDIT, STATE_NONE}
+    {"Normal", LV_SYMBOL_EDIT},
+    {"Strafe", LV_SYMBOL_EDIT},
+    {"Tilt", LV_SYMBOL_EDIT},
+    {"Config", LV_SYMBOL_EDIT}
 };
 const int MODE_SIZE = sizeof(MODE) / sizeof(MODE[0]);
 
 page LEG[] = {
-    {"Coxa", LV_SYMBOL_SETTINGS, STATE_JOINT},
-    {"Femur", LV_SYMBOL_SETTINGS, STATE_JOINT},
-    {"Tibia", LV_SYMBOL_SETTINGS, STATE_JOINT}
+    {"Coxa", LV_SYMBOL_SETTINGS},
+    {"Femur", LV_SYMBOL_SETTINGS},
+    {"Tibia", LV_SYMBOL_SETTINGS}
 };
 const int LEG_SIZE = sizeof(LEG) / sizeof(LEG[0]);
 
 page ANIMATION[] = {
-    {"Animation1", LV_SYMBOL_PLAY, STATE_NONE},
-    {"Animation2", LV_SYMBOL_PLAY, STATE_NONE},
-    {"Animation3", LV_SYMBOL_PLAY, STATE_NONE}
+    {"Animation1", LV_SYMBOL_PLAY},
+    {"Animation2", LV_SYMBOL_PLAY},
+    {"Animation3", LV_SYMBOL_PLAY}
 };
 const int ANIMATION_SIZE = sizeof(ANIMATION) / sizeof(ANIMATION[0]);
 
@@ -92,6 +87,10 @@ void add_menu_item(lv_obj_t * menu, lv_obj_t * page, const char * label_text, lv
     lv_obj_t * cont = lv_menu_cont_create(page);
     lv_obj_t * label = lv_label_create(cont);
     lv_label_set_text(label, label_text);
+
+    if (destination_page == nullptr) {
+        return; // no destination page to link to
+    }
     lv_menu_set_load_page_event(menu, cont, destination_page);
 }
 
@@ -128,7 +127,7 @@ void menuPage() {
     lv_obj_t * label;
 
     // config page
-    lv_obj_t * config_page = lv_menu_page_create(menu, "Config");
+    config_page = lv_menu_page_create(menu, "Config");
     create_dropdown(CONFIG, CONFIG_SIZE, config_page, "Leg"); // leg selection
     create_dropdown(LEG, LEG_SIZE, config_page, "Joint"); // joint selection
 
@@ -169,19 +168,19 @@ void menuPage() {
     lv_obj_center(apply_label);
 
     // gait page
-    lv_obj_t * gait_page = lv_menu_page_create(menu, "Gait");
+    gait_page = lv_menu_page_create(menu, "Gait");
     create_dropdown(GAIT, GAIT_SIZE, gait_page, "Gait Type");
 
     // mode page
-    lv_obj_t * mode_page = lv_menu_page_create(menu, "Mode");
+    mode_page = lv_menu_page_create(menu, "Mode");
     create_dropdown(MODE, MODE_SIZE, mode_page, "Mode Type");
 
     // main menu
     lv_obj_t * main_menu = lv_menu_page_create(menu, "Main Menu");
-    add_menu_item(menu, main_menu, "Config", config_page);
-    add_menu_item(menu, main_menu, "Gait", gait_page);
-    add_menu_item(menu, main_menu, "Mode", mode_page);
-    add_menu_item(menu, main_menu, "Animation", NULL);
+    for (int i = 0; i < MENU_SIZE; i++) {
+        lv_obj_t *dest = (MENU[i].destinationPage) ? *MENU[i].destinationPage : nullptr;
+        add_menu_item(menu, main_menu, MENU[i].item, dest);
+    }
 
     lv_menu_set_page(menu, main_menu);
 }

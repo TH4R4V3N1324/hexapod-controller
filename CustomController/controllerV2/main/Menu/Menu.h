@@ -9,40 +9,13 @@
 extern "C" {
 #endif
 
-typedef enum {
-    STATE_HOME,
-    STATE_MENU,
-    STATE_CONFIG,
-    STATE_MODE,
-    STATE_GAIT,
-    STATE_ANIMATION,
-    STATE_LEG,
-    STATE_JOINT,
-    STATE_NONE
-} States;
-
-
-// Definition of the stack used for navigation
-struct StateStack {
-    States state;
-    int item_selected;
-#ifdef __cplusplus
-    StateStack(int s = 0, int i = 0) : state(static_cast<States>(s)), item_selected(i) {}
-#endif
-};
-
-extern struct StateStack stateStack[STATE_STACK_MAX];
-extern int stackTop;
-extern int stackIndex;
-
-extern States currentState;
-extern States previousState;
-
 // Definition for page information
 struct page {
     const char* item;
     const char* icon;
-    States destination;
+    const void* bitmap;
+    lv_obj_t ** destinationPage;
+    void (*callback)(void); // optional action
 };
 
 enum Joints {coxa, femur, tibia};
