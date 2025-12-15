@@ -5,49 +5,49 @@ lv_obj_t *gait_page = NULL;
 lv_obj_t *mode_page = NULL;
 
 page MENU[] = {
-    {"Config", LV_SYMBOL_SETTINGS, nullptr, &config_page},
-    {"Mode", LV_SYMBOL_EDIT, nullptr, &mode_page},
-    {"Gait", LV_SYMBOL_REFRESH, nullptr, &gait_page},
-    {"Animation", LV_SYMBOL_PLAY}
+    {"Config", LV_SYMBOL_SETTINGS, nullptr, &config_page, nullptr},
+    {"Mode", LV_SYMBOL_EDIT, nullptr, &mode_page, nullptr},
+    {"Gait", LV_SYMBOL_REFRESH, nullptr, &gait_page, nullptr},
+    {"Animation", LV_SYMBOL_PLAY, nullptr, nullptr, nullptr}
 };
 const int MENU_SIZE = sizeof(MENU) / sizeof(MENU[0]);
 
 page CONFIG[] = {
-    {"Leg1", LV_SYMBOL_SETTINGS},
-    {"Leg2", LV_SYMBOL_SETTINGS},
-    {"Leg3", LV_SYMBOL_SETTINGS},
-    {"Leg4", LV_SYMBOL_SETTINGS},
-    {"Leg5", LV_SYMBOL_SETTINGS},
-    {"Leg6", LV_SYMBOL_SETTINGS}
+    {"Leg1", LV_SYMBOL_SETTINGS, nullptr, nullptr, nullptr},
+    {"Leg2", LV_SYMBOL_SETTINGS, nullptr, nullptr, nullptr},
+    {"Leg3", LV_SYMBOL_SETTINGS, nullptr, nullptr, nullptr},
+    {"Leg4", LV_SYMBOL_SETTINGS, nullptr, nullptr, nullptr},
+    {"Leg5", LV_SYMBOL_SETTINGS, nullptr, nullptr, nullptr},
+    {"Leg6", LV_SYMBOL_SETTINGS, nullptr, nullptr, nullptr}
 };
 const int CONFIG_SIZE = sizeof(CONFIG) / sizeof(CONFIG[0]);
 
 page GAIT[] = {
-    {"Tripod", LV_SYMBOL_REFRESH},
-    {"Ripple", LV_SYMBOL_REFRESH},
-    {"Wave", LV_SYMBOL_REFRESH}
+    {"Tripod", LV_SYMBOL_REFRESH, nullptr, nullptr, nullptr},
+    {"Ripple", LV_SYMBOL_REFRESH, nullptr, nullptr, nullptr},
+    {"Wave", LV_SYMBOL_REFRESH, nullptr, nullptr, nullptr}
 };
 const int GAIT_SIZE = sizeof(GAIT) / sizeof(GAIT[0]);
 
 page MODE[] = {
-    {"Normal", LV_SYMBOL_EDIT},
-    {"Strafe", LV_SYMBOL_EDIT},
-    {"Tilt", LV_SYMBOL_EDIT},
-    {"Config", LV_SYMBOL_EDIT}
+    {"Normal", LV_SYMBOL_EDIT, nullptr, nullptr, nullptr},
+    {"Strafe", LV_SYMBOL_EDIT, nullptr, nullptr, nullptr},
+    {"Tilt", LV_SYMBOL_EDIT, nullptr, nullptr, nullptr},
+    {"Config", LV_SYMBOL_EDIT, nullptr, nullptr, nullptr}
 };
 const int MODE_SIZE = sizeof(MODE) / sizeof(MODE[0]);
 
 page LEG[] = {
-    {"Coxa", LV_SYMBOL_SETTINGS},
-    {"Femur", LV_SYMBOL_SETTINGS},
-    {"Tibia", LV_SYMBOL_SETTINGS}
+    {"Coxa", LV_SYMBOL_SETTINGS, nullptr, nullptr, nullptr},
+    {"Femur", LV_SYMBOL_SETTINGS, nullptr, nullptr, nullptr},
+    {"Tibia", LV_SYMBOL_SETTINGS, nullptr, nullptr, nullptr}
 };
 const int LEG_SIZE = sizeof(LEG) / sizeof(LEG[0]);
 
 page ANIMATION[] = {
-    {"Animation1", LV_SYMBOL_PLAY},
-    {"Animation2", LV_SYMBOL_PLAY},
-    {"Animation3", LV_SYMBOL_PLAY}
+    {"Animation1", LV_SYMBOL_PLAY, nullptr, nullptr, nullptr},
+    {"Animation2", LV_SYMBOL_PLAY, nullptr, nullptr, nullptr},
+    {"Animation3", LV_SYMBOL_PLAY, nullptr, nullptr, nullptr}
 };
 const int ANIMATION_SIZE = sizeof(ANIMATION) / sizeof(ANIMATION[0]);
 
@@ -83,15 +83,19 @@ void create_dropdown(page * items, int size, lv_obj_t * parent, const char * lab
     lv_obj_set_width(dd, 200);
 }
 
-void add_menu_item(lv_obj_t * menu, lv_obj_t * page, const char * label_text, lv_obj_t * destination_page) {
+void add_menu_item(lv_obj_t * menu, lv_obj_t * page, struct page item) {
     lv_obj_t * cont = lv_menu_cont_create(page);
-    lv_obj_t * label = lv_label_create(cont);
-    lv_label_set_text(label, label_text);
 
-    if (destination_page == nullptr) {
-        return; // no destination page to link to
-    }
-    lv_menu_set_load_page_event(menu, cont, destination_page);
+    lv_obj_t * icon = lv_label_create(cont);
+    lv_label_set_text(icon, item.icon);
+
+    lv_obj_t * label = lv_label_create(cont);
+    lv_label_set_text(label, item.item);
+
+    lv_obj_t *dest = (item.destinationPage) ? *item.destinationPage : nullptr;
+    if (dest == nullptr) {return;} // no action if no destination
+
+    lv_menu_set_load_page_event(menu, cont, dest);
 }
 
 void homePage() {
@@ -178,8 +182,7 @@ void menuPage() {
     // main menu
     lv_obj_t * main_menu = lv_menu_page_create(menu, "Main Menu");
     for (int i = 0; i < MENU_SIZE; i++) {
-        lv_obj_t *dest = (MENU[i].destinationPage) ? *MENU[i].destinationPage : nullptr;
-        add_menu_item(menu, main_menu, MENU[i].item, dest);
+        add_menu_item(menu, main_menu, MENU[i]);
     }
 
     lv_menu_set_page(menu, main_menu);
