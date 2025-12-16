@@ -244,6 +244,33 @@ void homePage() {
     lv_obj_set_layout(state_panel, LV_LAYOUT_GRID);
     lv_obj_set_grid_dsc_array(state_panel, cols_state_panel, rows_state_panel);
 
+    // Gait Label
+    lv_obj_t * gait_label = lv_label_create(state_panel);
+    lv_label_set_text(gait_label, "Gait: Tripod");
+    lv_obj_set_grid_cell(
+        gait_label,
+        LV_GRID_ALIGN_START, 0, 1,    // column
+        LV_GRID_ALIGN_CENTER, 0, 1     // row
+    );
+
+    // Mode Label
+    lv_obj_t * mode_label = lv_label_create(state_panel);
+    lv_label_set_text(mode_label, "Mode: Normal");
+    lv_obj_set_grid_cell(
+        mode_label,
+        LV_GRID_ALIGN_START, 0, 1,    // column
+        LV_GRID_ALIGN_CENTER, 1, 1     // row
+    );
+
+    // motion state Label
+    lv_obj_t * motion_label = lv_label_create(state_panel);
+    lv_label_set_text(motion_label, "State: Idle");
+    lv_obj_set_grid_cell(
+        motion_label,
+        LV_GRID_ALIGN_START, 0, 1,    // column
+        LV_GRID_ALIGN_CENTER, 2, 1     // row
+    );
+
     /* Visualization Panel */
     lv_obj_t * visualization_panel = lv_obj_create(home_screen);
     lv_obj_set_grid_cell(
