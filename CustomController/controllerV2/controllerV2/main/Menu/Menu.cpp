@@ -282,7 +282,8 @@ void homePage() {
 
     // placeholder for visualization content
     lv_obj_t * viz_img = lv_img_create(visualization_panel);
-    lv_img_set_src(viz_img, &HEX);
+    lv_img_set_src(viz_img, "S:/ui/anims/idle_blink/idle_blink_1.bin");
+    //lv_img_set_src(viz_img, &HEX);
     lv_obj_center(viz_img);
     
     /* Info Tiles */
