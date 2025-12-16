@@ -164,6 +164,20 @@ void homePage() {
     lv_obj_set_layout(status_bar, LV_LAYOUT_GRID);
     lv_obj_set_grid_dsc_array(status_bar, cols_status_bar, rows_status_bar);
 
+    // Connectivity Status
+    lv_obj_t * conn_status = lv_label_create(status_bar);
+    lv_label_set_text(conn_status, LV_SYMBOL_WIFI);
+
+    bool wifi_connected = true; // placeholder
+
+    lv_obj_set_style_text_color(conn_status, (wifi_connected) ? lv_color_hex(0x00FF00) : lv_color_hex(0xFF0000), 0);
+
+    lv_obj_set_grid_cell(
+        conn_status,
+        LV_GRID_ALIGN_START, 0, 1,    // column
+        LV_GRID_ALIGN_CENTER, 0, 1     // row
+    );
+
     // Battery Status
     lv_obj_t * battery_cont = lv_obj_create(status_bar);
     lv_obj_set_flex_flow(battery_cont, LV_FLEX_FLOW_ROW);
