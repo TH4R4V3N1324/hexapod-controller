@@ -289,12 +289,11 @@ void homePage() {
 
     static lv_coord_t cols_info_tiles[] = {
         LV_GRID_FR(1),
-        LV_GRID_FR(1),
-        LV_GRID_FR(1),
         LV_GRID_TEMPLATE_LAST
     };
 
     static lv_coord_t rows_info_tiles[] = {
+        LV_GRID_FR(1),
         LV_GRID_FR(1),
         LV_GRID_FR(1),
         LV_GRID_TEMPLATE_LAST
@@ -302,6 +301,24 @@ void homePage() {
 
     lv_obj_set_layout(info_tiles, LV_LAYOUT_GRID);
     lv_obj_set_grid_dsc_array(info_tiles, cols_info_tiles, rows_info_tiles);
+
+    // tilt info
+    lv_obj_t * tilt_info = lv_label_create(info_tiles);
+    lv_label_set_text(tilt_info, "Tilt: x:0 y:0 z:0");
+    lv_obj_set_grid_cell(
+        tilt_info,
+        LV_GRID_ALIGN_START, 0, 1,    // column
+        LV_GRID_ALIGN_CENTER, 0, 1     // row
+    );
+
+    // battery info
+    lv_obj_t * battery_info = lv_label_create(info_tiles);
+    lv_label_set_text_fmt(battery_info, "Battery: %.2fV", 11.1);
+    lv_obj_set_grid_cell(
+        battery_info,
+        LV_GRID_ALIGN_START, 0, 1,    // column
+        LV_GRID_ALIGN_CENTER, 1, 1     // row
+    );
 
     /* Action Bar */
     lv_obj_t * action_bar = lv_obj_create(home_screen);   
