@@ -345,20 +345,43 @@ void homePage() {
     lv_obj_set_layout(action_bar, LV_LAYOUT_GRID);
     lv_obj_set_grid_dsc_array(action_bar, cols_action_bar, rows_action_bar);
 
+    // Menu Button
     lv_obj_t *menu_btn = lv_btn_create(action_bar);
     lv_obj_add_style(menu_btn, &icon_style, 0);
-
+    lv_obj_t *menu_btn_label = lv_label_create(menu_btn);
+    lv_obj_align(menu_btn_label, LV_ALIGN_CENTER, 0, 0);
+    lv_label_set_text(menu_btn_label, "Menu");
     lv_obj_set_grid_cell(
         menu_btn,
-        LV_GRID_ALIGN_CENTER, 0, 1,    // column
+        LV_GRID_ALIGN_START, 0, 1,    // column
         LV_GRID_ALIGN_CENTER, 0, 1     // row
     );
 
-    lv_obj_t *menu_label = lv_label_create(menu_btn);
-    lv_obj_align(menu_label, LV_ALIGN_CENTER, 0, 0);
-    lv_label_set_text(menu_label, "Menu");
-
     lv_obj_add_event_cb(menu_btn, [](lv_event_t * e){ menuPage(); }, LV_EVENT_CLICKED, NULL);
+
+    // Gait Button
+    lv_obj_t *gait_btn = lv_btn_create(action_bar);
+    lv_obj_add_style(gait_btn, &icon_style, 0);
+    lv_obj_t *gait_btn_label = lv_label_create(gait_btn);
+    lv_obj_align(gait_btn_label, LV_ALIGN_CENTER, 0, 0);
+    lv_label_set_text(gait_btn_label, "Gait");
+    lv_obj_set_grid_cell(
+        gait_btn,
+        LV_GRID_ALIGN_CENTER, 1, 1,    // column
+        LV_GRID_ALIGN_CENTER, 0, 1     // row
+    );
+
+    // Mode Button
+    lv_obj_t *mode_btn = lv_btn_create(action_bar);
+    lv_obj_add_style(mode_btn, &icon_style, 0);
+    lv_obj_t *mode_btn_label = lv_label_create(mode_btn);
+    lv_obj_align(mode_btn_label, LV_ALIGN_CENTER, 0, 0);
+    lv_label_set_text(mode_btn_label, "Mode");
+    lv_obj_set_grid_cell(
+        mode_btn,
+        LV_GRID_ALIGN_END, 2, 1,    // column
+        LV_GRID_ALIGN_CENTER, 0, 1     // row
+    );
 
     lv_scr_load(home_screen);
 }
