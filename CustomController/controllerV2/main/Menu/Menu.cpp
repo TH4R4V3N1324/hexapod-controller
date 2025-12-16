@@ -566,10 +566,10 @@ void menuPage() {
 
     lv_menu_set_page(menu, main_menu);
 
-    auto_step_timer = lv_timer_create(display_volts, 100, NULL);
+    auto_step_timer = lv_timer_create(debugInfo, 100, NULL);
 }
 
-void display_volts(lv_timer_t * timer){
+void debugInfo(lv_timer_t * timer){
     char buf[100]; 
     
     snprintf(buf, sizeof(buf), "%ld MB\r\n", SDCard_Size);
