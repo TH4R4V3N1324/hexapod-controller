@@ -1,5 +1,6 @@
 #include "Menu.h"
 
+
 lv_obj_t *config_page = NULL;
 lv_obj_t *gait_page = NULL;
 lv_obj_t *mode_page = NULL;
@@ -12,6 +13,22 @@ lv_obj_t * BAT_Volts;
 lv_obj_t * Board_angle;
 lv_obj_t * RTC_Time;
 lv_obj_t * Wireless_Scan;
+
+static lv_obj_t *battery_icon;
+static lv_obj_t *battery_percent;
+
+// --- Battery voltage averaging ---
+#define BAT_AVG_BUF_SIZE 50
+static float bat_voltage_buf[BAT_AVG_BUF_SIZE] = {0};
+static int bat_voltage_idx = 0;
+static int bat_voltage_count = 0;
+
+static float get_bat_voltage_avg() {
+    float sum = 0;
+    int n = bat_voltage_count < BAT_AVG_BUF_SIZE ? bat_voltage_count : BAT_AVG_BUF_SIZE;
+    for (int i = 0; i < n; ++i) sum += bat_voltage_buf[i];
+    return n > 0 ? sum / n : 0;
+}
 
 page MENU[] = {
     {"Config", LV_SYMBOL_SETTINGS, nullptr, &config_page, nullptr},
@@ -193,27 +210,11 @@ void homePage() {
     lv_obj_set_flex_flow(battery_cont, LV_FLEX_FLOW_ROW);
     lv_obj_set_flex_align(battery_cont, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
 
-    float voltage = BAT_Get_Volts();
-    int percent = (int)((voltage - 3.3f) / (4.2f - 3.3f) * 100);
-    if(percent > 100) percent = 100;
-    if(percent < 0) percent = 0;
+    battery_icon = lv_label_create(battery_cont);
+    lv_label_set_text(battery_icon, LV_SYMBOL_BATTERY_FULL);
 
-    lv_obj_t * battery_icon = lv_label_create(battery_cont);
-
-    if (percent >= 90)
-        lv_label_set_text(battery_icon, LV_SYMBOL_BATTERY_FULL);
-    else if (percent >= 75)
-        lv_label_set_text(battery_icon, LV_SYMBOL_BATTERY_3);
-    else if (percent >= 50)
-        lv_label_set_text(battery_icon, LV_SYMBOL_BATTERY_2);
-    else if (percent >= 25)
-        lv_label_set_text(battery_icon, LV_SYMBOL_BATTERY_1);
-    else
-        lv_label_set_text(battery_icon, LV_SYMBOL_BATTERY_EMPTY);
-
-    lv_obj_t * battery_percent_label = lv_label_create(battery_cont);
-    
-    lv_label_set_text_fmt(battery_percent_label, "%d%%", percent);
+    battery_percent = lv_label_create(battery_cont);
+    lv_label_set_text(battery_percent, "--%"); // placeholder
 
     lv_obj_set_grid_cell(
         battery_cont,
@@ -388,6 +389,8 @@ void homePage() {
         LV_GRID_ALIGN_END, 2, 1,    // column
         LV_GRID_ALIGN_CENTER, 0, 1     // row
     );
+
+    auto_step_timer = lv_timer_create(homeInfo, 100, NULL);
 
     lv_scr_load(home_screen);
 }
@@ -587,4 +590,31 @@ void debugInfo(lv_timer_t * timer){
     else
         snprintf(buf, sizeof(buf), "WIFI: %d    BLE: %d\r\n",WIFI_NUM,BLE_NUM);
     lv_textarea_set_placeholder_text(Wireless_Scan, buf);
+}
+
+void homeInfo(lv_timer_t * timer){
+    // Add latest voltage to buffer
+    bat_voltage_buf[bat_voltage_idx] = BAT_analogVolts;
+    bat_voltage_idx = (bat_voltage_idx + 1) % BAT_AVG_BUF_SIZE;
+    if (bat_voltage_count < BAT_AVG_BUF_SIZE) bat_voltage_count++;
+
+    float avg_voltage = get_bat_voltage_avg();
+    int percent = (int)((avg_voltage - 3.3f) / (4.2f - 3.3f) * 100);
+    if(percent > 100) percent = 100;
+    if(percent < 0) percent = 0;
+
+    // Update icon
+    if(percent >= 90)
+        lv_label_set_text(battery_icon, LV_SYMBOL_BATTERY_FULL);
+    else if(percent >= 75)
+        lv_label_set_text(battery_icon, LV_SYMBOL_BATTERY_3);
+    else if(percent >= 50)
+        lv_label_set_text(battery_icon, LV_SYMBOL_BATTERY_2);
+    else if(percent >= 25)
+        lv_label_set_text(battery_icon, LV_SYMBOL_BATTERY_1);
+    else
+        lv_label_set_text(battery_icon, LV_SYMBOL_BATTERY_EMPTY);
+
+    // Update percentage
+    lv_label_set_text_fmt(battery_percent, "%d%%", percent);
 }

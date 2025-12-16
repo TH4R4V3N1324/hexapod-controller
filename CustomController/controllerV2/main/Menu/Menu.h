@@ -32,6 +32,7 @@ enum Modes {MODE_NORMAL, MODE_STRAFE, MODE_TILT, MODE_CONFIG, NUM_MODES};
 void homePage();
 void menuPage();
 void debugInfo(lv_timer_t * timer);
+void homeInfo(lv_timer_t * timer);
 
 #ifdef __cplusplus
 }
