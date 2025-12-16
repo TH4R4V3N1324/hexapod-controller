@@ -109,13 +109,16 @@ void add_menu_item(lv_obj_t * menu, lv_obj_t * page, struct page item) {
 void homePage() {
     lv_theme_default_init(NULL, lv_palette_main(LV_PALETTE_BLUE), lv_palette_main(LV_PALETTE_RED), true, &lv_font_montserrat_32);
 
-    lv_obj_t * home_screen = lv_obj_create(NULL);
-    lv_obj_set_size(home_screen, lv_disp_get_hor_res(NULL), lv_disp_get_ver_res(NULL));
-
     static lv_style_t home_style;
     lv_style_init(&home_style);
-    lv_style_set_text_font(&home_style, &lv_font_montserrat_16); // or your enabled 16px font
+    lv_style_set_text_font(&home_style, &lv_font_montserrat_16);
 
+    static lv_style_t icon_style;
+    lv_style_init(&icon_style);
+    lv_style_set_text_font(&icon_style, &lv_font_montserrat_32);
+
+    lv_obj_t * home_screen = lv_obj_create(NULL);
+    lv_obj_set_size(home_screen, lv_disp_get_hor_res(NULL), lv_disp_get_ver_res(NULL));
     lv_obj_add_style(home_screen, &home_style, 0);
 
     static lv_coord_t col_home[] = { 
@@ -137,6 +140,9 @@ void homePage() {
 
     /* Status Bar */
     lv_obj_t * status_bar = lv_obj_create(home_screen);
+    lv_obj_clear_flag(status_bar, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_add_style(status_bar, &icon_style, 0);
+
     lv_obj_set_grid_cell(
         status_bar,
         LV_GRID_ALIGN_STRETCH, 0, 1,    // column
@@ -157,6 +163,28 @@ void homePage() {
 
     lv_obj_set_layout(status_bar, LV_LAYOUT_GRID);
     lv_obj_set_grid_dsc_array(status_bar, cols_status_bar, rows_status_bar);
+
+    lv_obj_t * battery_cont = lv_obj_create(status_bar);
+    lv_obj_set_flex_flow(battery_cont, LV_FLEX_FLOW_ROW);
+    lv_obj_set_flex_align(battery_cont, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+
+    lv_obj_t * battery_icon = lv_label_create(battery_cont);
+    lv_label_set_text(battery_icon, LV_SYMBOL_BATTERY_FULL);
+
+    lv_obj_t * battery_percent_label = lv_label_create(battery_cont);
+    
+    float voltage = BAT_Get_Volts();
+    int percent = (int)((voltage - 3.3f) / (4.2f - 3.3f) * 100);
+    if(percent > 100) percent = 100;
+    if(percent < 0) percent = 0;
+
+    lv_label_set_text_fmt(battery_percent_label, "%d%%", percent);
+
+    lv_obj_set_grid_cell(
+        battery_cont,
+        LV_GRID_ALIGN_CENTER, 2, 1,    // column
+        LV_GRID_ALIGN_CENTER, 0, 1     // row
+    );
 
     /* State Panel */
     lv_obj_t * state_panel = lv_obj_create(home_screen);
@@ -216,6 +244,7 @@ void homePage() {
     /* Action Bar */
     lv_obj_t * action_bar = lv_obj_create(home_screen);   
     lv_obj_clear_flag(action_bar, LV_OBJ_FLAG_SCROLLABLE); 
+
     lv_obj_set_grid_cell(
         action_bar,
         LV_GRID_ALIGN_STRETCH, 0, 1,    // column
