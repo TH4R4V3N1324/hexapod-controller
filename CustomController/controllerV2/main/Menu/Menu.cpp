@@ -164,20 +164,31 @@ void homePage() {
     lv_obj_set_layout(status_bar, LV_LAYOUT_GRID);
     lv_obj_set_grid_dsc_array(status_bar, cols_status_bar, rows_status_bar);
 
+    // Battery Status
     lv_obj_t * battery_cont = lv_obj_create(status_bar);
     lv_obj_set_flex_flow(battery_cont, LV_FLEX_FLOW_ROW);
     lv_obj_set_flex_align(battery_cont, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
 
-    lv_obj_t * battery_icon = lv_label_create(battery_cont);
-    lv_label_set_text(battery_icon, LV_SYMBOL_BATTERY_FULL);
-
-    lv_obj_t * battery_percent_label = lv_label_create(battery_cont);
-    
     float voltage = BAT_Get_Volts();
     int percent = (int)((voltage - 3.3f) / (4.2f - 3.3f) * 100);
     if(percent > 100) percent = 100;
     if(percent < 0) percent = 0;
 
+    lv_obj_t * battery_icon = lv_label_create(battery_cont);
+
+    if (percent >= 90)
+        lv_label_set_text(battery_icon, LV_SYMBOL_BATTERY_FULL);
+    else if (percent >= 75)
+        lv_label_set_text(battery_icon, LV_SYMBOL_BATTERY_3);
+    else if (percent >= 50)
+        lv_label_set_text(battery_icon, LV_SYMBOL_BATTERY_2);
+    else if (percent >= 25)
+        lv_label_set_text(battery_icon, LV_SYMBOL_BATTERY_1);
+    else
+        lv_label_set_text(battery_icon, LV_SYMBOL_BATTERY_EMPTY);
+
+    lv_obj_t * battery_percent_label = lv_label_create(battery_cont);
+    
     lv_label_set_text_fmt(battery_percent_label, "%d%%", percent);
 
     lv_obj_set_grid_cell(
@@ -267,6 +278,7 @@ void homePage() {
     lv_obj_set_grid_dsc_array(action_bar, cols_action_bar, rows_action_bar);
 
     lv_obj_t *menu_btn = lv_btn_create(action_bar);
+    lv_obj_add_style(menu_btn, &icon_style, 0);
 
     lv_obj_set_grid_cell(
         menu_btn,
