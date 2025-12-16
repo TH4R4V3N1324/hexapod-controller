@@ -281,10 +281,9 @@ void homePage() {
     );
 
     // placeholder for visualization content
-    lv_obj_t * viz_label = lv_label_create(visualization_panel);
-    lv_label_set_text(viz_label, LV_SYMBOL_HOME);
-    lv_obj_set_style_text_font(viz_label, &lv_font_montserrat_48, 0);
-    lv_obj_center(viz_label);
+    lv_obj_t * viz_img = lv_img_create(visualization_panel);
+    lv_img_set_src(viz_img, &HEX);
+    lv_obj_center(viz_img);
     
     /* Info Tiles */
     lv_obj_t * info_tiles = lv_obj_create(home_screen);

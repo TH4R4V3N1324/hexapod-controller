@@ -8,6 +8,7 @@ extern "C" {
 #include "lvgl.h"
 
 extern const lv_img_dsc_t normal_mode_icon;
+extern const lv_img_dsc_t HEX;
 
 #ifdef __cplusplus
 }
