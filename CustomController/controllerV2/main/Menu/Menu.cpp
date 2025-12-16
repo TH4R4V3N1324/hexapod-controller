@@ -39,7 +39,7 @@ page MENU[] = {
 };
 const int MENU_SIZE = sizeof(MENU) / sizeof(MENU[0]);
 
-page CONFIG[] = {
+page LEG[] = {
     {"Leg1", LV_SYMBOL_SETTINGS, nullptr, nullptr, nullptr},
     {"Leg2", LV_SYMBOL_SETTINGS, nullptr, nullptr, nullptr},
     {"Leg3", LV_SYMBOL_SETTINGS, nullptr, nullptr, nullptr},
@@ -47,7 +47,7 @@ page CONFIG[] = {
     {"Leg5", LV_SYMBOL_SETTINGS, nullptr, nullptr, nullptr},
     {"Leg6", LV_SYMBOL_SETTINGS, nullptr, nullptr, nullptr}
 };
-const int CONFIG_SIZE = sizeof(CONFIG) / sizeof(CONFIG[0]);
+const int LEG_SIZE = sizeof(LEG) / sizeof(LEG[0]);
 
 page GAIT[] = {
     {"Tripod", LV_SYMBOL_REFRESH, nullptr, nullptr, nullptr},
@@ -64,12 +64,12 @@ page MODE[] = {
 };
 const int MODE_SIZE = sizeof(MODE) / sizeof(MODE[0]);
 
-page LEG[] = {
+page JOINT[] = {
     {"Coxa", LV_SYMBOL_SETTINGS, nullptr, nullptr, nullptr},
     {"Femur", LV_SYMBOL_SETTINGS, nullptr, nullptr, nullptr},
     {"Tibia", LV_SYMBOL_SETTINGS, nullptr, nullptr, nullptr}
 };
-const int LEG_SIZE = sizeof(LEG) / sizeof(LEG[0]);
+const int JOINT_SIZE = sizeof(JOINT) / sizeof(JOINT[0]);
 
 page ANIMATION[] = {
     {"Animation1", LV_SYMBOL_PLAY, nullptr, nullptr, nullptr},
@@ -511,8 +511,8 @@ void menuPage() {
 
     // config page
     config_page = lv_menu_page_create(menu, "Config");
-    create_dropdown(CONFIG, CONFIG_SIZE, config_page, "Leg"); // leg selection
-    create_dropdown(LEG, LEG_SIZE, config_page, "Joint"); // joint selection
+    create_dropdown(LEG, LEG_SIZE, config_page, "Leg"); // leg selection
+    create_dropdown(JOINT, JOINT_SIZE, config_page, "Joint"); // joint selection
 
     // offset selection
     cont = lv_menu_cont_create(config_page);
