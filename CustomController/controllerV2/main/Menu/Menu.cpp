@@ -178,6 +178,16 @@ void homePage() {
         LV_GRID_ALIGN_CENTER, 0, 1     // row
     );
 
+    // up time
+    lv_obj_t * up_time = lv_label_create(status_bar);
+    lv_label_set_text(up_time, "00:15");
+    
+    lv_obj_set_grid_cell(
+        up_time,
+        LV_GRID_ALIGN_CENTER, 1, 1,    // column
+        LV_GRID_ALIGN_CENTER, 0, 1     // row
+    );
+
     // Battery Status
     lv_obj_t * battery_cont = lv_obj_create(status_bar);
     lv_obj_set_flex_flow(battery_cont, LV_FLEX_FLOW_ROW);
