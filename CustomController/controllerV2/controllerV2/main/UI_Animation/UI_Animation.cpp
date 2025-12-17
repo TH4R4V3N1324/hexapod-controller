@@ -62,23 +62,76 @@ void leg_anim_cb(void * var, int32_t v)
 }
 
 void hexapodIcon(lv_obj_t * parent) {
+    // Hexapod container
     lv_obj_t *hexapod = lv_obj_create(parent);
     lv_obj_set_size(hexapod, 250, 250);
     lv_obj_center(hexapod);
     lv_obj_clear_flag(hexapod, LV_OBJ_FLAG_SCROLLABLE);
 
+    // Hexapod body
     lv_obj_t *body = lv_obj_create(hexapod);
     lv_obj_set_size(body, 120, 120);
     lv_obj_set_style_radius(body, LV_RADIUS_CIRCLE, 0);
     lv_obj_set_style_bg_color(body, lv_color_white(), 0);
     lv_obj_center(body);
 
-    lv_obj_t *eye = lv_obj_create(body);
-    lv_obj_set_size(eye, 28, 28);
-    lv_obj_set_style_radius(eye, LV_RADIUS_CIRCLE, 0);
-    lv_obj_set_style_bg_color(eye, lv_color_black(), 0);
-    lv_obj_align(eye, LV_ALIGN_CENTER, -20, -10);
+    // Hexapod left eye
+    lv_obj_t *eye_left = lv_obj_create(body);
+    lv_obj_clear_flag(eye_left, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_size(eye_left, 40, 40);
+    lv_obj_set_style_radius(eye_left, LV_RADIUS_CIRCLE, 0);
+    lv_obj_set_style_bg_color(eye_left, lv_color_black(), 0);
+    lv_obj_align(eye_left, LV_ALIGN_CENTER, -20, -10);
 
+    // left eye pupil and reflections
+    lv_obj_t *pupil_left = lv_obj_create(eye_left);
+    lv_obj_t *reflect1_left = lv_obj_create(eye_left);
+    lv_obj_t *reflect2_left = lv_obj_create(eye_left);
+
+    lv_obj_set_size(pupil_left, 15, 15);
+    lv_obj_set_style_radius(pupil_left, LV_RADIUS_CIRCLE, 0);
+    lv_obj_set_style_bg_color(pupil_left, lv_color_white(), 0);
+    lv_obj_align(pupil_left, LV_ALIGN_CENTER, -7, -7);
+    
+    lv_obj_set_size(reflect1_left, 10, 10);
+    lv_obj_set_style_radius(reflect1_left, LV_RADIUS_CIRCLE, 0);
+    lv_obj_set_style_bg_color(reflect1_left, lv_color_white(), 0);
+    lv_obj_align(reflect1_left, LV_ALIGN_CENTER, 3, 4);
+
+    lv_obj_set_size(reflect2_left, 8, 8);
+    lv_obj_set_style_radius(reflect2_left, LV_RADIUS_CIRCLE, 0);
+    lv_obj_set_style_bg_color(reflect2_left, lv_color_white(), 0);
+    lv_obj_align(reflect2_left, LV_ALIGN_CENTER, 6, -3);
+
+    // Hexapod right eye (duplicate, not mirrored)
+    lv_obj_t *eye_right = lv_obj_create(body);
+    lv_obj_clear_flag(eye_right, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_size(eye_right, 40, 40);
+    lv_obj_set_style_radius(eye_right, LV_RADIUS_CIRCLE, 0);
+    lv_obj_set_style_bg_color(eye_right, lv_color_black(), 0);
+    lv_obj_align(eye_right, LV_ALIGN_CENTER, 20, -10); // same y, positive x offset
+
+    // right eye pupil and reflections (same offsets as left)
+    lv_obj_t *pupil_right = lv_obj_create(eye_right);
+    lv_obj_t *reflect1_right = lv_obj_create(eye_right);
+    lv_obj_t *reflect2_right = lv_obj_create(eye_right);
+
+    lv_obj_set_size(pupil_right, 15, 15);
+    lv_obj_set_style_radius(pupil_right, LV_RADIUS_CIRCLE, 0);
+    lv_obj_set_style_bg_color(pupil_right, lv_color_white(), 0);
+    lv_obj_align(pupil_right, LV_ALIGN_CENTER, -7, -7);
+    
+    lv_obj_set_size(reflect1_right, 10, 10);
+    lv_obj_set_style_radius(reflect1_right, LV_RADIUS_CIRCLE, 0);
+    lv_obj_set_style_bg_color(reflect1_right, lv_color_white(), 0);
+    lv_obj_align(reflect1_right, LV_ALIGN_CENTER, 3, 4);
+
+    lv_obj_set_size(reflect2_right, 8, 8);
+    lv_obj_set_style_radius(reflect2_right, LV_RADIUS_CIRCLE, 0);
+    lv_obj_set_style_bg_color(reflect2_right, lv_color_white(), 0);
+    lv_obj_align(reflect2_right, LV_ALIGN_CENTER, 6, -3);
+
+    // Legs
     int radius = 60;
     int box_size = 250;
 
