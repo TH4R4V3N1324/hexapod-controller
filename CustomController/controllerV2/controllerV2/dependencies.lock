@@ -3,15 +3,15 @@ dependencies:
     source:
       type: idf
     version: 5.5.1
-  lvgl/lvgl:
+  lvgl:
     dependencies: []
     source:
-      path: C:\Users\raven\Downloads\ESP32-S3-Touch-LCD-2.8B-Demo\ESP-IDF\ESP32-S3-Touch-LCD-2.8B-Test\components\lvgl__lvgl
+      path: D:\Hexapod\CustomController\controllerV2\controllerV2\components\lvgl
       type: local
     version: 8.2.0
 direct_dependencies:
 - idf
 - lvgl/lvgl
-manifest_hash: 7bf1fb2108074131d59b17ccc7087a480d4e6f0c05824312faeffc8b6bc2915d
+manifest_hash: 56b01e993934784c24d19f2eadc60e7bd09faf8017d2db57c3ff0d1773e426ed
 target: esp32s3
 version: 2.0.0

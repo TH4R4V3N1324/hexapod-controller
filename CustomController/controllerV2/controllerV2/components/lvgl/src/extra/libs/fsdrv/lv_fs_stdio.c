@@ -1,3 +1,6 @@
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
 /**
  * @file lv_fs_stdio.c
  *
@@ -54,6 +57,21 @@ static lv_fs_res_t fs_dir_close(lv_fs_drv_t * drv, void * dir_p);
 /**
  * Register a driver for the File system interface
  */
+
+// Helper to robustly convert LV_FS_STDIO_LETTER macro to char
+static char get_fs_letter(void) {
+#if defined(LV_FS_STDIO_LETTER)
+    const char *val = LV_FS_STDIO_LETTER;
+    if (val && strlen(val) == 1 && isalpha((unsigned char)val[0])) {
+        return val[0];
+    } else if (val && strlen(val) > 1) {
+        int ascii = atoi(val);
+        if (ascii > 0 && ascii < 128) return (char)ascii;
+    }
+#endif
+    return 'S'; // fallback
+}
+
 void lv_fs_stdio_init(void)
 {
     /*---------------------------------------------------
@@ -64,9 +82,18 @@ void lv_fs_stdio_init(void)
     static lv_fs_drv_t fs_drv; /*A driver descriptor*/
     lv_fs_drv_init(&fs_drv);
 
-    /*Set up fields...*/
-    fs_drv.letter = LV_FS_STDIO_LETTER;
-    fs_drv.cache_size = LV_FS_STDIO_CACHE_SIZE;
+    fs_drv.letter = get_fs_letter();
+
+    // Robust runtime check for LV_FS_STDIO_CACHE_SIZE
+#if defined(LV_FS_STDIO_CACHE_SIZE)
+    if (LV_FS_STDIO_CACHE_SIZE && LV_FS_STDIO_CACHE_SIZE[0] != '\0') {
+        fs_drv.cache_size = atoi(LV_FS_STDIO_CACHE_SIZE);
+    } else {
+        fs_drv.cache_size = 512;
+    }
+#else
+    fs_drv.cache_size = 512;
+#endif
 
     fs_drv.open_cb = fs_open;
     fs_drv.close_cb = fs_close;

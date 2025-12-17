@@ -1,6 +1,7 @@
 #ifndef MENU_H
 #define MENU_H
 
+#include <stdio.h>
 #include "LVGL_Driver.h"
 #include "Bitmap.h"
 #include "TCA9554PWR.h"

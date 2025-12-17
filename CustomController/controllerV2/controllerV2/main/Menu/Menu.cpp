@@ -280,11 +280,9 @@ void homePage() {
         LV_GRID_ALIGN_STRETCH, 2, 1     // row
     );
 
-    // placeholder for visualization content
-    lv_obj_t * viz_img = lv_img_create(visualization_panel);
-    lv_img_set_src(viz_img, "S:/ui/anims/idle_blink/idle_blink_1.bin");
-    //lv_img_set_src(viz_img, &HEX);
-    lv_obj_center(viz_img);
+    lv_obj_t * anim_img = lv_img_create(visualization_panel);
+    lv_img_set_src(anim_img, "S:/ui/anims/idle/blink0.bin");
+    lv_obj_center(anim_img);
     
     /* Info Tiles */
     lv_obj_t * info_tiles = lv_obj_create(home_screen);
