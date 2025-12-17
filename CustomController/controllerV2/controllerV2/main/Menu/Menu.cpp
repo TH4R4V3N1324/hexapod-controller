@@ -27,7 +27,7 @@ hex_leg_line leg5 = {40, 0, 0, 0};
 hex_leg_line leg6 = {30, 30, 0, 0};
 hex_leg_line legs[] = {leg1, leg2, leg3, leg4, leg5, leg6};
 int leg_angles[] = {45, 0, -45, -135, 180, 135};
-lv_coord_t line_offset = 15;
+lv_coord_t line_offset = 17;
 static lv_point_t leg_points[6][2];
 
 // --- Battery voltage averaging ---
@@ -207,7 +207,8 @@ void hexapodIcon(lv_obj_t * parent) {
         leg_anim[i].dir_x = cosf(angle_rad);
         leg_anim[i].dir_y = -sinf(angle_rad);
 
-        leg_anim[i].phase = (i % 2) * 300;
+        uint32_t cycle = 1400;
+        leg_anim[i].phase = (i % 2) ? (cycle / 2) : 0;
 
         lv_anim_t a;
         lv_anim_init(&a);
@@ -216,7 +217,7 @@ void hexapodIcon(lv_obj_t * parent) {
 
         lv_anim_set_values(&a, -LEG_STRIDE, LEG_STRIDE);
         lv_anim_set_time(&a, 700);
-        lv_anim_set_playback_time(&a, 600);
+        lv_anim_set_playback_time(&a, 700);
         lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE);
         lv_anim_set_delay(&a, leg_anim[i].phase);
 
