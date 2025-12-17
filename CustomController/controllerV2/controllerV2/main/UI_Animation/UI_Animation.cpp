@@ -67,6 +67,8 @@ void hexapodIcon(lv_obj_t * parent) {
     lv_obj_set_size(hexapod, 250, 250);
     lv_obj_center(hexapod);
     lv_obj_clear_flag(hexapod, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_style_bg_opa(hexapod, LV_OPA_TRANSP, 0);
+    lv_obj_set_style_border_width(hexapod, 0, 0);
 
     // Hexapod body
     lv_obj_t *body = lv_obj_create(hexapod);

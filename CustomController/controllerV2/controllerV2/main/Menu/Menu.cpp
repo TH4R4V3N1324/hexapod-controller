@@ -271,17 +271,14 @@ void homePage() {
         LV_GRID_ALIGN_CENTER, 2, 1     // row
     );
 
-    /* Visualization Panel *////////////////////////////////////////////////////////////////////////
+    /* Visualization Panel */
     lv_obj_t * visualization_panel = lv_obj_create(home_screen);
+    lv_obj_clear_flag(visualization_panel, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_set_grid_cell(
         visualization_panel,
         LV_GRID_ALIGN_STRETCH, 0, 1,    // column
         LV_GRID_ALIGN_STRETCH, 2, 1     // row
     );
-
-    //lv_obj_t * anim_img = lv_img_create(visualization_panel);
-    //lv_img_set_src(anim_img, "S:/ui/anims/idle/blink0.bin");
-    //lv_obj_center(anim_img);
 
     hexapodIcon(visualization_panel);
     
