@@ -1,5 +1,7 @@
 #include "Menu.h"
 
+#define LEG_STRIDE 10
+#define LEG_LIFT   10
 
 lv_obj_t *config_page = NULL;
 lv_obj_t *gait_page = NULL;
@@ -134,6 +136,20 @@ void add_menu_item(lv_obj_t * menu, lv_obj_t * page, struct page item) {
     lv_menu_set_load_page_event(menu, cont, dest);
 }
 
+void leg_anim_cb(void * var, int32_t v)
+{
+    hex_leg_anim_t * leg = (hex_leg_anim_t *)var;
+
+    leg->pts[0].x = leg->hip_x;
+    leg->pts[0].y = leg->hip_y;
+
+    leg->pts[1].x = leg->hip_x + (int)(leg->dir_x * (30 + v));
+    leg->pts[1].y = leg->hip_y + (int)(leg->dir_y * (30 + v))
+                    - (abs(v) < LEG_LIFT ? LEG_LIFT - abs(v) : 0);
+
+    lv_line_set_points(leg->line, leg->pts, 2);
+}
+
 void hexapodIcon(lv_obj_t * parent) {
     lv_obj_t *hexapod = lv_obj_create(parent);
     lv_obj_set_size(hexapod, 250, 250);
@@ -154,6 +170,8 @@ void hexapodIcon(lv_obj_t * parent) {
 
     int radius = 60;
     int box_size = 250;
+
+    static hex_leg_anim_t leg_anim[6];
 
     for (int i = 0; i < 6; i++) {
         lv_coord_t leg_pos_x = box_size / 2 + radius * cos(leg_angles[i] * M_PI / 180);
@@ -177,6 +195,32 @@ void hexapodIcon(lv_obj_t * parent) {
 
         /* Position */
         lv_obj_set_pos(leg_upper, leg_pos_x - start_offset_x, leg_pos_y - start_offset_y);
+
+        float angle_rad = leg_angles[i] * M_PI / 180.0f;
+
+        leg_anim[i].line = leg_upper;
+        leg_anim[i].pts  = leg_points[i];
+
+        leg_anim[i].hip_x = leg_points[i][0].x;
+        leg_anim[i].hip_y = leg_points[i][0].y;
+
+        leg_anim[i].dir_x = cosf(angle_rad);
+        leg_anim[i].dir_y = -sinf(angle_rad);
+
+        leg_anim[i].phase = (i % 2) * 300;
+
+        lv_anim_t a;
+        lv_anim_init(&a);
+        lv_anim_set_var(&a, &leg_anim[i]);
+        lv_anim_set_exec_cb(&a, leg_anim_cb);
+
+        lv_anim_set_values(&a, -LEG_STRIDE, LEG_STRIDE);
+        lv_anim_set_time(&a, 700);
+        lv_anim_set_playback_time(&a, 600);
+        lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE);
+        lv_anim_set_delay(&a, leg_anim[i].phase);
+
+        lv_anim_start(&a);
     }
 }
 

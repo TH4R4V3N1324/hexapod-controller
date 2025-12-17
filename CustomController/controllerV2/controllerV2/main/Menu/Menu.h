@@ -34,6 +34,19 @@ struct hex_leg_line {
     lv_coord_t line_end_y;
 };
 
+typedef struct {
+    lv_obj_t * line;
+    lv_point_t * pts;
+
+    int hip_x;
+    int hip_y;
+
+    float dir_x;
+    float dir_y;
+
+    int phase;
+} hex_leg_anim_t;
+
 enum Joints {coxa, femur, tibia};
 enum Gaits {GAIT_TRIPOD, GAIT_RIPPLE, GAIT_WAVE, NUM_GAITS};
 enum Modes {MODE_NORMAL, MODE_STRAFE, MODE_TILT, MODE_CONFIG, NUM_MODES};
