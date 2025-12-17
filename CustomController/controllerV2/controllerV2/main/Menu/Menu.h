@@ -11,6 +11,7 @@
 #include "Wireless.h"
 #include "Buzzer.h"
 #include "BAT_Driver.h"
+#include <math.h>
 #define STATE_STACK_MAX 10
 
 #ifdef __cplusplus
@@ -24,6 +25,13 @@ struct page {
     const void* bitmap;
     lv_obj_t ** destinationPage;
     void (*callback)(void); // optional action
+};
+
+struct hex_leg_line {
+    lv_coord_t line_start_x;
+    lv_coord_t line_start_y;
+    lv_coord_t line_end_x;
+    lv_coord_t line_end_y;
 };
 
 enum Joints {coxa, femur, tibia};

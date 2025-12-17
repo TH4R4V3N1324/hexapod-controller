@@ -17,6 +17,17 @@ lv_obj_t * Wireless_Scan;
 static lv_obj_t *battery_icon;
 static lv_obj_t *battery_percent;
 
+hex_leg_line leg1 = {0, 30, 30, 0};
+hex_leg_line leg2 = {0, 0, 40, 0}; 
+hex_leg_line leg3 = {0, 0, 30, 30};
+hex_leg_line leg4 = {30, 0, 0, 30};
+hex_leg_line leg5 = {40, 0, 0, 0};
+hex_leg_line leg6 = {30, 30, 0, 0};
+hex_leg_line legs[] = {leg1, leg2, leg3, leg4, leg5, leg6};
+int leg_angles[] = {45, 0, -45, -135, 180, 135};
+lv_coord_t line_offset = 15;
+static lv_point_t leg_points[6][2];
+
 // --- Battery voltage averaging ---
 #define BAT_AVG_BUF_SIZE 50
 static float bat_voltage_buf[BAT_AVG_BUF_SIZE] = {0};
@@ -121,6 +132,52 @@ void add_menu_item(lv_obj_t * menu, lv_obj_t * page, struct page item) {
     if (dest == nullptr) {return;} // no action if no destination
 
     lv_menu_set_load_page_event(menu, cont, dest);
+}
+
+void hexapodIcon(lv_obj_t * parent) {
+    lv_obj_t *hexapod = lv_obj_create(parent);
+    lv_obj_set_size(hexapod, 250, 250);
+    lv_obj_center(hexapod);
+    lv_obj_clear_flag(hexapod, LV_OBJ_FLAG_SCROLLABLE);
+
+    lv_obj_t *body = lv_obj_create(hexapod);
+    lv_obj_set_size(body, 120, 120);
+    lv_obj_set_style_radius(body, LV_RADIUS_CIRCLE, 0);
+    lv_obj_set_style_bg_color(body, lv_color_white(), 0);
+    lv_obj_center(body);
+
+    lv_obj_t *eye = lv_obj_create(body);
+    lv_obj_set_size(eye, 28, 28);
+    lv_obj_set_style_radius(eye, LV_RADIUS_CIRCLE, 0);
+    lv_obj_set_style_bg_color(eye, lv_color_black(), 0);
+    lv_obj_align(eye, LV_ALIGN_CENTER, -20, -10);
+
+    int radius = 60;
+    int box_size = 250;
+
+    for (int i = 0; i < 6; i++) {
+        lv_coord_t leg_pos_x = box_size / 2 + radius * cos(leg_angles[i] * M_PI / 180);
+        lv_coord_t leg_pos_y = box_size / 2 - radius * sin(leg_angles[i] * M_PI / 180);
+
+        lv_obj_t * leg_upper = lv_line_create(hexapod);
+
+        lv_coord_t start_offset_x = legs[i].line_start_x + line_offset;
+        lv_coord_t start_offset_y = legs[i].line_start_y + line_offset;
+
+        leg_points[i][0].x = legs[i].line_start_x;
+        leg_points[i][0].y = legs[i].line_start_y;
+        leg_points[i][1].x = legs[i].line_end_x;
+        leg_points[i][1].y = legs[i].line_end_y;
+
+        lv_line_set_points(leg_upper, leg_points[i], 2);
+
+        lv_obj_set_style_line_width(leg_upper, 25, LV_PART_MAIN);
+        lv_obj_set_style_line_color(leg_upper, lv_color_white(), LV_PART_MAIN);
+        lv_obj_set_style_line_rounded(leg_upper, true, LV_PART_MAIN);
+
+        /* Position */
+        lv_obj_set_pos(leg_upper, leg_pos_x - start_offset_x, leg_pos_y - start_offset_y);
+    }
 }
 
 void homePage() {
@@ -272,7 +329,7 @@ void homePage() {
         LV_GRID_ALIGN_CENTER, 2, 1     // row
     );
 
-    /* Visualization Panel */
+    /* Visualization Panel *////////////////////////////////////////////////////////////////////////
     lv_obj_t * visualization_panel = lv_obj_create(home_screen);
     lv_obj_set_grid_cell(
         visualization_panel,
@@ -280,9 +337,11 @@ void homePage() {
         LV_GRID_ALIGN_STRETCH, 2, 1     // row
     );
 
-    lv_obj_t * anim_img = lv_img_create(visualization_panel);
-    lv_img_set_src(anim_img, "S:/ui/anims/idle/blink0.bin");
-    lv_obj_center(anim_img);
+    //lv_obj_t * anim_img = lv_img_create(visualization_panel);
+    //lv_img_set_src(anim_img, "S:/ui/anims/idle/blink0.bin");
+    //lv_obj_center(anim_img);
+
+    hexapodIcon(visualization_panel);
     
     /* Info Tiles */
     lv_obj_t * info_tiles = lv_obj_create(home_screen);
