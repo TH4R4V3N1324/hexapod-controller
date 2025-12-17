@@ -3,12 +3,12 @@
 #define LEG_STRIDE 10
 #define LEG_LIFT   10
 
-hex_leg_line leg1 = {0, 30, 30, 0};
-hex_leg_line leg2 = {0, 0, 40, 0}; 
-hex_leg_line leg3 = {0, 0, 30, 30};
-hex_leg_line leg4 = {30, 0, 0, 30};
-hex_leg_line leg5 = {40, 0, 0, 0};
-hex_leg_line leg6 = {30, 30, 0, 0};
+hex_leg_line leg1 = {0, 40, 40, 0};
+hex_leg_line leg2 = {0, 0, 50, 0}; 
+hex_leg_line leg3 = {0, 0, 40, 40};
+hex_leg_line leg4 = {40, 0, 0, 40};
+hex_leg_line leg5 = {50, 0, 0, 0};
+hex_leg_line leg6 = {40, 40, 0, 0};
 hex_leg_line legs[] = {leg1, leg2, leg3, leg4, leg5, leg6};
 int leg_angles[] = {45, 0, -45, -135, 180, 135};
 lv_coord_t line_offset = 17;

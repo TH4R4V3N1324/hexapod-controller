@@ -495,7 +495,9 @@ void debugPage(lv_obj_t * parent) {
 }
 
 void menuPage() {
-    lv_obj_t * menu = lv_menu_create(lv_scr_act());
+    lv_obj_t * menu_scr = lv_obj_create(NULL); 
+
+    lv_obj_t * menu = lv_menu_create(menu_scr);
     lv_menu_set_mode_root_back_btn(menu, LV_MENU_ROOT_BACK_BTN_ENABLED);
     lv_obj_add_event_cb(menu, back_btn_event_cb, LV_EVENT_CLICKED, menu);
     lv_obj_set_size(menu, lv_disp_get_hor_res(NULL), lv_disp_get_ver_res(NULL));
@@ -566,6 +568,8 @@ void menuPage() {
     lv_menu_set_page(menu, main_menu);
 
     auto_step_timer = lv_timer_create(debugInfo, 100, NULL);
+
+    lv_scr_load(menu_scr);
 }
 
 void debugInfo(lv_timer_t * timer){
