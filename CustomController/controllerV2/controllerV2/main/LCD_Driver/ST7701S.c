@@ -181,9 +181,9 @@ void ST7701S_WriteData(ST7701S_handle St7701S_handle, uint8_t data)
 esp_err_t ST7701S_reset(void)
 {
     Set_EXIO(TCA9554_EXIO1, false);
-    vTaskDelay(pdMS_TO_TICKS(50));  // Hold reset low for 50ms (was 10ms)
+    vTaskDelay(pdMS_TO_TICKS(10));
     Set_EXIO(TCA9554_EXIO1, true);
-    vTaskDelay(pdMS_TO_TICKS(50));  // Wait for reset high stabilization (was 10ms)
+    vTaskDelay(pdMS_TO_TICKS(10));
     return ESP_OK;
 }
 
@@ -223,21 +223,10 @@ esp_lcd_panel_handle_t panel_handle = NULL;
 void LCD_Init(void)
 {
     /********************* LCD *********************/
-    ESP_LOGI(LCD_TAG, "LCD initialization starting");
-    
-    // Display reset was already set HIGH by EXIO_Init, but we perform a full reset cycle here
-    ESP_LOGI(LCD_TAG, "Performing LCD reset sequence");
     ST7701S_reset();
-    vTaskDelay(pdMS_TO_TICKS(200));  // Allow display to exit reset and initialize internally
-    
-    ESP_LOGI(LCD_TAG, "Enabling CS and initializing SPI");
     ST7701S_CS_EN();
     vTaskDelay(pdMS_TO_TICKS(100));
     ST7701S_handle st7701s = ST7701S_newObject(LCD_MOSI, LCD_SCLK, LCD_CS, SPI2_HOST, SPI_METHOD);
-    vTaskDelay(pdMS_TO_TICKS(100));  // Allow SPI bus to initialize
-    
-    ESP_LOGI(LCD_TAG, "Configuring display via SPI");
-    vTaskDelay(pdMS_TO_TICKS(50));   // Extra stabilization before commands
     
     ST7701S_screen_init(st7701s, 1);
     #if CONFIG_EXAMPLE_AVOID_TEAR_EFFECT_WITH_SEM
