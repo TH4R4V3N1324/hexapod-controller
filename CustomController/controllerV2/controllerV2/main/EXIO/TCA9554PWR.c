@@ -90,6 +90,10 @@ void TCA9554PWR_Init(uint8_t PinState)                  // Set the seven pins to
 esp_err_t EXIO_Init(void)
 {
     TCA9554PWR_Init(0x00);
+    // CRITICAL: Set LCD reset pin HIGH on power-up to ensure display is not in reset
+    // This must be done before any other initialization that uses the display
+    Set_EXIO(TCA9554_EXIO1, true);   // LCD RST = HIGH (not in reset)
+    vTaskDelay(pdMS_TO_TICKS(50));   // Brief delay to ensure pin settles
     Buzzer_Off();
     return ESP_OK;
 }
