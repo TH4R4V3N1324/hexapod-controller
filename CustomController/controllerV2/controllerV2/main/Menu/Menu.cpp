@@ -17,7 +17,7 @@ static lv_obj_t *battery_icon;
 static lv_obj_t *battery_percent;
 
 // --- Battery voltage averaging ---
-#define BAT_AVG_BUF_SIZE 50
+#define BAT_AVG_BUF_SIZE 100
 static float bat_voltage_buf[BAT_AVG_BUF_SIZE] = {0};
 static int bat_voltage_idx = 0;
 static int bat_voltage_count = 0;
@@ -599,7 +599,7 @@ void homeInfo(lv_timer_t * timer){
     if (bat_voltage_count < BAT_AVG_BUF_SIZE) bat_voltage_count++;
 
     float avg_voltage = get_bat_voltage_avg();
-    int percent = (int)((avg_voltage - 3.3f) / (4.2f - 3.3f) * 100);
+    int percent = (int)((avg_voltage - 2.8f) / (4.2f - 2.8f) * 100);
     if(percent > 100) percent = 100;
     if(percent < 0) percent = 0;
 
