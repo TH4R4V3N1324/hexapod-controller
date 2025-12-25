@@ -1,4 +1,4 @@
-#include "Menu.h"
+#include "Display.h"
 
 lv_obj_t *config_page = NULL;
 lv_obj_t *gait_page = NULL;

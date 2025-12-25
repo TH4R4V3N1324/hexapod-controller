@@ -15,7 +15,7 @@ idf_component_register(
           "BAT_Driver/BAT_Driver.c"
           "Bitmaps/normal_mode_icon.c"
           "Bitmaps/HEX.c"
-          "Menu/Menu.cpp"
+          "Display/Display.cpp"
           "UI_Animation/UI_Animation.cpp"
 
     INCLUDE_DIRS "./EXIO"
@@ -32,7 +32,7 @@ idf_component_register(
                  "./Buzzer"
                  "./BAT_Driver"
                  "./Bitmaps"
-                 "./Menu"
+                 "./Display"
                  "./UI_Animation"
                  "."
 )

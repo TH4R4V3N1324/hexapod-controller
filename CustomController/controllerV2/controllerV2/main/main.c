@@ -12,7 +12,7 @@
 #include "LVGL_Example.h"
 #include "Wireless.h"
 #include "BAT_Driver.h"
-#include "Menu.h"
+#include "Display.h"
 
 void Driver_Loop(void *parameter)
 {

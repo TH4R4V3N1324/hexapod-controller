@@ -1,5 +1,5 @@
-#ifndef MENU_H
-#define MENU_H
+#ifndef DISPLAY_H
+#define DISPLAY_H
 
 #include <stdio.h>
 #include "LVGL_Driver.h"
@@ -39,4 +39,4 @@ void homeInfo(lv_timer_t * timer);
 }
 #endif
 
-#endif // MENU_H
+#endif // DISPLAY_H
