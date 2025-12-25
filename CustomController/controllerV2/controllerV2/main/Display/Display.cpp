@@ -16,6 +16,7 @@ lv_obj_t * Wireless_Scan;
 static lv_obj_t *battery_icon;
 static lv_obj_t *battery_percent;
 static lv_obj_t *conn_status;
+static lv_obj_t *up_time;
 
 // --- Battery voltage averaging ---
 #define BAT_AVG_BUF_SIZE 100
@@ -192,8 +193,8 @@ void homePage() {
     );
 
     // up time
-    lv_obj_t * up_time = lv_label_create(status_bar);
-    lv_label_set_text(up_time, "00:15");
+    up_time = lv_label_create(status_bar);
+    lv_label_set_text(up_time, "00:00");
     
     lv_obj_set_grid_cell(
         up_time,
@@ -619,4 +620,6 @@ void homeInfo(lv_timer_t * timer){
     if (conn_status != NULL) {
         lv_obj_set_style_text_color(conn_status, (receiverConnected) ? lv_color_hex(0x00FF00) : lv_color_hex(0xFF0000), 0);
     }
+
+    lv_label_set_text_fmt(up_time, "%02d:%02d", datetime.hour , datetime.minute);
 }
