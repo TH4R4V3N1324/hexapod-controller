@@ -51,6 +51,7 @@ extern "C" {
 
 extern ControlPacket controlPacket;
 extern HexPacket hexPacket;
+extern bool receiverConnected;
 
 void sendData();
 void initESPNow();

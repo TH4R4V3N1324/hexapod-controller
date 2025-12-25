@@ -15,6 +15,7 @@ lv_obj_t * Wireless_Scan;
 
 static lv_obj_t *battery_icon;
 static lv_obj_t *battery_percent;
+static lv_obj_t *conn_status;
 
 // --- Battery voltage averaging ---
 #define BAT_AVG_BUF_SIZE 100
@@ -181,12 +182,8 @@ void homePage() {
     lv_obj_set_grid_dsc_array(status_bar, cols_status_bar, rows_status_bar);
 
     // Connectivity Status
-    lv_obj_t * conn_status = lv_label_create(status_bar);
+    conn_status = lv_label_create(status_bar);
     lv_label_set_text(conn_status, LV_SYMBOL_WIFI);
-
-    bool wifi_connected = true; // placeholder
-
-    lv_obj_set_style_text_color(conn_status, (wifi_connected) ? lv_color_hex(0x00FF00) : lv_color_hex(0xFF0000), 0);
 
     lv_obj_set_grid_cell(
         conn_status,
@@ -617,4 +614,9 @@ void homeInfo(lv_timer_t * timer){
 
     // Update percentage
     lv_label_set_text_fmt(battery_percent, "%d%%", percent);
+
+    // Update connection status color
+    if (conn_status != NULL) {
+        lv_obj_set_style_text_color(conn_status, (receiverConnected) ? lv_color_hex(0x00FF00) : lv_color_hex(0xFF0000), 0);
+    }
 }

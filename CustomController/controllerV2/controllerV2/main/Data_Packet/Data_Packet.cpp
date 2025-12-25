@@ -4,6 +4,8 @@ static const char *TAG = "ESP_NOW";
 uint8_t receiverMAC[6] = {0x30, 0xC9, 0x22, 0x28, 0x73, 0x4C};
 static int64_t previousTimeUs = 0;
 
+bool receiverConnected = false;
+
 // Define the global packet variables
 ControlPacket controlPacket = {
     .joystick1X = 0,
@@ -49,10 +51,6 @@ static void onHexDataReceived(const esp_now_recv_info_t *recv_info, const uint8_
 			firstPacket = false;
 		}
 	}
-
-    ESP_LOGI(TAG, "Data received from: %02X:%02X:%02X:%02X:%02X:%02X, Length: %d",
-            recv_info->src_addr[0], recv_info->src_addr[1], recv_info->src_addr[2],
-            recv_info->src_addr[3], recv_info->src_addr[4], recv_info->src_addr[5], len);
 }
 
 void print_mac(void) {
@@ -61,6 +59,15 @@ void print_mac(void) {
 
     ESP_LOGI("MAC", "STA MAC: %02X:%02X:%02X:%02X:%02X:%02X",
              mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+}
+
+static void onDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
+    if (status == ESP_NOW_SEND_SUCCESS) {
+        receiverConnected = true;
+    } else {
+        ESP_LOGW(TAG, "Send failed");
+        receiverConnected = false;
+    }
 }
 
 /*
@@ -80,6 +87,10 @@ void initESPNow(void) {
 
     ESP_ERROR_CHECK(
         esp_now_register_recv_cb(onHexDataReceived)
+    );
+
+    ESP_ERROR_CHECK(
+        esp_now_register_send_cb(onDataSent)
     );
 
     print_mac();
