@@ -17,6 +17,7 @@ idf_component_register(
           "Bitmaps/HEX.c"
           "Display/Display.cpp"
           "UI_Animation/UI_Animation.cpp"
+          "Data_Packet/Data_Packet.cpp"
 
     INCLUDE_DIRS "./EXIO"
                  "./LCD_Driver"
@@ -34,5 +35,6 @@ idf_component_register(
                  "./Bitmaps"
                  "./Display"
                  "./UI_Animation"
+                 "./Data_Packet"
                  "."
 )

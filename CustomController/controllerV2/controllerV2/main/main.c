@@ -13,6 +13,7 @@
 #include "Wireless.h"
 #include "BAT_Driver.h"
 #include "Display.h"
+#include "Data_Packet.h"
 
 void Driver_Loop(void *parameter)
 {
@@ -46,6 +47,7 @@ void Driver_Init(void)
 void app_main(void)
 {   
     Wireless_Init();
+    initESPNow();  // Initialize ESP-NOW after WiFi
     Driver_Init();
     LCD_Init();
     Touch_Init();
@@ -55,6 +57,7 @@ void app_main(void)
 
     while (1) {
         vTaskDelay(pdMS_TO_TICKS(10));
+        sendData();
         lv_timer_handler();
     }
 }
