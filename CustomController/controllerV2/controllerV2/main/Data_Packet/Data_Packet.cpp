@@ -1,6 +1,7 @@
 #include "Data_Packet.h"
 
-static const char *TAG = "ESP_NOW";
+static const char *ESPN_TAG = "ESP_NOW";
+static const char *I2C_TAG = "I2C";
 uint8_t receiverMAC[6] = {0x30, 0xC9, 0x22, 0x28, 0x73, 0x4C};
 static int64_t previousTimeUs = 0;
 
@@ -29,7 +30,7 @@ void sendData() {
 	esp_err_t result = esp_now_send(receiverMAC, (uint8_t *)&controlPacket, sizeof(ControlPacket));
 
 	if (result != ESP_OK) {
-        ESP_LOGE(TAG, "Send failed: %s", esp_err_to_name(result));
+        ESP_LOGE(ESPN_TAG, "Send failed: %s", esp_err_to_name(result));
     }
 
 	previousTimeUs = currentTimeUs; // update the last send time
@@ -65,7 +66,7 @@ static void onDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
     if (status == ESP_NOW_SEND_SUCCESS) {
         receiverConnected = true;
     } else {
-        ESP_LOGW(TAG, "Send failed");
+        //ESP_LOGW(TAG, "Send failed");
         receiverConnected = false;
     }
 }
@@ -96,3 +97,26 @@ void initESPNow(void) {
     print_mac();
 }
 
+void scanI2CDevices() {
+    uint8_t devices[128];
+    int numDevices = 0;
+
+    for (uint8_t address = 1; address < 127; address++) {
+        // Build a minimal write command to test ACK from the slave
+        i2c_cmd_handle_t cmd = i2c_cmd_link_create();
+        i2c_master_start(cmd);
+        i2c_master_write_byte(cmd, (address << 1) | I2C_MASTER_WRITE, true);
+        i2c_master_stop(cmd);
+        esp_err_t result = i2c_master_cmd_begin(I2C_MASTER_NUM, cmd, 100 / portTICK_PERIOD_MS);
+        i2c_cmd_link_delete(cmd);
+
+        if (result == ESP_OK) {
+            devices[numDevices++] = address;
+        }
+    }
+
+    ESP_LOGI(I2C_TAG, "I2C Devices Found: %d", numDevices);
+    for (int i = 0; i < numDevices; i++) {
+        ESP_LOGI(I2C_TAG, " - Address: 0x%02X", devices[i]);
+    }
+}

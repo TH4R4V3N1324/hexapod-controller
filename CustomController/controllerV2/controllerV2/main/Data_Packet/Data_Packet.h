@@ -12,6 +12,9 @@
 #include "nvs_flash.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "driver/i2c.h"
+
+#define I2C_MASTER_NUM I2C_NUM_0 // Use I2C_NUM_0 to match i2c_port_t type
 
 typedef enum : uint8_t {
     CMD_NONE = 0,
@@ -55,6 +58,7 @@ extern bool receiverConnected;
 
 void sendData();
 void initESPNow();
+void scanI2CDevices();
 
 #ifdef __cplusplus
 }
