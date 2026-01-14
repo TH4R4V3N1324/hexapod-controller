@@ -392,138 +392,35 @@ void homePage() {
 }
 
 void debugPage(lv_obj_t * parent) {
-    lv_obj_t * cont;
-    lv_obj_t * label;
+    auto row = [&](const char* label, const char* hint, lv_obj_t*& ta) {
+    lv_obj_t* cont = lv_menu_cont_create(debug_page);
+    lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_ROW);
+    lv_obj_set_flex_align(cont, LV_FLEX_ALIGN_SPACE_BETWEEN,
+                          LV_FLEX_ALIGN_CENTER,
+                          LV_FLEX_ALIGN_CENTER);
+
+    lv_obj_t* l = lv_label_create(cont);
+    lv_label_set_text(l, label);
+
+    ta = lv_textarea_create(cont);
+    lv_textarea_set_one_line(ta, true);
+    lv_textarea_set_placeholder_text(ta, hint);
+    lv_obj_add_event_cb(ta, ta_event_cb, LV_EVENT_ALL, nullptr);
+
+    lv_obj_set_style_text_font(l, &lv_font_montserrat_24, 0);
+    lv_obj_set_style_text_font(ta, &lv_font_montserrat_24, 0);
+};
 
     debug_page = lv_menu_page_create(parent, "DEBUG");
 
-    // SD Card info
-    cont = lv_menu_cont_create(debug_page);
-    lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_ROW);
-    lv_obj_set_flex_align(cont, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-
-    lv_obj_t * SD_label = lv_label_create(cont);
-    lv_label_set_text(SD_label, "SD Card");
-
-    SD_Size = lv_textarea_create(cont);
-    lv_textarea_set_one_line(SD_Size, true);
-    lv_textarea_set_placeholder_text(SD_Size, "SD Size");
-    lv_obj_add_event_cb(SD_Size, ta_event_cb, LV_EVENT_ALL, NULL);
-
-    lv_obj_set_style_text_font(SD_label, &lv_font_montserrat_24, 0);
-    lv_obj_set_style_text_font(SD_Size, &lv_font_montserrat_24, 0);
-
-    // Flash info
-    cont = lv_menu_cont_create(debug_page);
-    lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_ROW);
-    lv_obj_set_flex_align(cont, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-
-    lv_obj_t * Flash_label = lv_label_create(cont);
-    lv_label_set_text(Flash_label, "Flash Size");
-
-    FlashSize = lv_textarea_create(cont);
-    lv_textarea_set_one_line(FlashSize, true);
-    lv_textarea_set_placeholder_text(FlashSize, "Flash Size");
-    lv_obj_add_event_cb(FlashSize, ta_event_cb, LV_EVENT_ALL, NULL);
-
-    lv_obj_set_style_text_font(Flash_label, &lv_font_montserrat_24, 0);
-    lv_obj_set_style_text_font(FlashSize, &lv_font_montserrat_24, 0);
-
-    // Battery voltage info
-    cont = lv_menu_cont_create(debug_page);
-    lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_ROW);
-    lv_obj_set_flex_align(cont, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-
-    lv_obj_t * BAT_label = lv_label_create(cont);
-    lv_label_set_text(BAT_label, "Battery");
-
-    BAT_Volts = lv_textarea_create(cont);
-    lv_textarea_set_one_line(BAT_Volts, true);
-    lv_textarea_set_placeholder_text(BAT_Volts, "BAT Volts");
-    lv_obj_add_event_cb(BAT_Volts, ta_event_cb, LV_EVENT_ALL, NULL);
-
-    lv_obj_set_style_text_font(BAT_label, &lv_font_montserrat_24, 0);
-    lv_obj_set_style_text_font(BAT_Volts, &lv_font_montserrat_24, 0);
-
-    // Board angle info
-    cont = lv_menu_cont_create(debug_page);
-    lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_ROW);
-    lv_obj_set_flex_align(cont, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-
-    lv_obj_t * angle_label = lv_label_create(cont);
-    lv_label_set_text(angle_label, "IMU Angle");
-
-    Board_angle = lv_textarea_create(cont);
-    lv_textarea_set_one_line(Board_angle, true);
-    lv_textarea_set_placeholder_text(Board_angle, "Board angle");
-    lv_obj_add_event_cb(Board_angle, ta_event_cb, LV_EVENT_ALL, NULL);
-
-    lv_obj_set_style_text_font(angle_label, &lv_font_montserrat_24, 0);
-    lv_obj_set_style_text_font(Board_angle, &lv_font_montserrat_24, 0);
-
-    // RTC Time info
-    cont = lv_menu_cont_create(debug_page);
-    lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_ROW);
-    lv_obj_set_flex_align(cont, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-
-    lv_obj_t * Time_label = lv_label_create(cont);
-    lv_label_set_text(Time_label, "RTC Time");
-
-    RTC_Time = lv_textarea_create(cont);
-    lv_textarea_set_one_line(RTC_Time, true);
-    lv_textarea_set_placeholder_text(RTC_Time, "Display time");
-    lv_obj_add_event_cb(RTC_Time, ta_event_cb, LV_EVENT_ALL, NULL);
-
-    lv_obj_set_style_text_font(Time_label, &lv_font_montserrat_24, 0);
-    lv_obj_set_style_text_font(RTC_Time, &lv_font_montserrat_24, 0);
-
-    // Wireless scan info
-    cont = lv_menu_cont_create(debug_page);
-    lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_ROW);
-    lv_obj_set_flex_align(cont, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-
-    lv_obj_t * Wireless_label = lv_label_create(cont);
-    lv_label_set_text(Wireless_label, "Wireless");
-
-    Wireless_Scan = lv_textarea_create(cont);
-    lv_textarea_set_one_line(Wireless_Scan, true);
-    lv_textarea_set_placeholder_text(Wireless_Scan, "Wireless number");
-    lv_obj_add_event_cb(Wireless_Scan, ta_event_cb, LV_EVENT_ALL, NULL);
-
-    lv_obj_set_style_text_font(Wireless_label, &lv_font_montserrat_24, 0);
-    lv_obj_set_style_text_font(Wireless_Scan, &lv_font_montserrat_24, 0);
-
-    // Joystick
-    cont = lv_menu_cont_create(debug_page);
-    lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_ROW);
-    lv_obj_set_flex_align(cont, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-
-    lv_obj_t * Joy_label = lv_label_create(cont);
-    lv_label_set_text(Joy_label, "Joystick1");
-
-    Joy1 = lv_textarea_create(cont);
-    lv_textarea_set_one_line(Joy1, true);
-    lv_textarea_set_placeholder_text(Joy1, "Joy1 X/Y/btn");
-    lv_obj_add_event_cb(Joy1, ta_event_cb, LV_EVENT_ALL, NULL);
-
-    lv_obj_set_style_text_font(Joy_label, &lv_font_montserrat_24, 0);
-    lv_obj_set_style_text_font(Joy1, &lv_font_montserrat_24, 0);
-
-    // Dpad
-    cont = lv_menu_cont_create(debug_page);
-    lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_ROW);
-    lv_obj_set_flex_align(cont, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-
-    lv_obj_t * Dpad_label = lv_label_create(cont);
-    lv_label_set_text(Dpad_label, "Dpad");
-
-    Dpad = lv_textarea_create(cont);
-    lv_textarea_set_one_line(Dpad, true);
-    lv_textarea_set_placeholder_text(Dpad, "Dpad up/down/left/right");
-    lv_obj_add_event_cb(Dpad, ta_event_cb, LV_EVENT_ALL, NULL);
-
-    lv_obj_set_style_text_font(Dpad_label, &lv_font_montserrat_24, 0);
-    lv_obj_set_style_text_font(Dpad, &lv_font_montserrat_24, 0);
+    row("SD Card", "SD Size", SD_Size);
+    row("Flash Size", "Flash Size", FlashSize);
+    row("Battery", "BAT Volts", BAT_Volts);
+    row("IMU Angle", "Board angle", Board_angle);
+    row("RTC Time", "Display time", RTC_Time);
+    row("Wireless", "Wireless number", Wireless_Scan);
+    row("Joystick1", "Joy1 X/Y/btn", Joy1);
+    row("Dpad", "Dpad up/down/left/right", Dpad);
 }
 
 void menuPage() {
