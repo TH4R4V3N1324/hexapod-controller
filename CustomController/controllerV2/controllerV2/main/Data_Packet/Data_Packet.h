@@ -13,8 +13,14 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "driver/i2c.h"
+#include "driver/uart.h"
 
 #define I2C_MASTER_NUM I2C_NUM_0 // Use I2C_NUM_0 to match i2c_port_t type
+
+#define UART_NUM UART_NUM_1
+#define RX1 44
+#define TX1 43
+#define UART_BUF_SIZE 256
 
 typedef enum : uint8_t {
     CMD_NONE = 0,
@@ -48,17 +54,38 @@ typedef struct {
 } HexPacket;
 #pragma pack(pop)
 
+typedef struct __attribute__((packed)) {
+    uint8_t start;     // START_BYTE (0xAA)
+    uint8_t version;   // Protocol version
+    int16_t joy_x;
+    int16_t joy_y;
+    uint8_t buttons;   // bitfield (see below)
+    uint8_t checksum;
+} LeftPacket;
+
+#define START_BYTE 0xAA
+
+#define BTN_JOY   (1 << 0)
+#define BTN_UP    (1 << 1)
+#define BTN_DOWN  (1 << 2)
+#define BTN_LEFT  (1 << 3)
+#define BTN_RIGHT (1 << 4)
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 extern ControlPacket controlPacket;
 extern HexPacket hexPacket;
+extern LeftPacket leftPacket;
 extern bool receiverConnected;
 
 void sendData();
 void initESPNow();
 void scanI2CDevices();
+void initUart();
+void request_left_controller();
+void uart_loop(void);
 
 #ifdef __cplusplus
 }

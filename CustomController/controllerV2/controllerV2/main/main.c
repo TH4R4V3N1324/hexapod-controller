@@ -34,6 +34,7 @@ void Driver_Init(void)
     PCF85063_Init();
     QMI8658_Init();
     EXIO_Init();                    // Example Initialize EXIO
+    initUart();
     xTaskCreatePinnedToCore(
         Driver_Loop, 
         "Other Driver task",
@@ -59,6 +60,8 @@ void app_main(void)
     while (1) {
         vTaskDelay(pdMS_TO_TICKS(10));
         sendData();
+        request_left_controller();
+        uart_loop();
         lv_timer_handler();
     }
 }

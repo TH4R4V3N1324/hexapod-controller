@@ -7,6 +7,11 @@ static int64_t previousTimeUs = 0;
 
 bool receiverConnected = false;
 
+uint8_t byte;
+LeftPacket leftPacket;
+uint8_t packet_index = 0;
+bool receiving = false;
+
 // Define the global packet variables
 ControlPacket controlPacket = {
     .joystick1X = 0,
@@ -54,6 +59,9 @@ static void onHexDataReceived(const esp_now_recv_info_t *recv_info, const uint8_
 	}
 }
 
+/*
+@brief Prints the MAC address of the device
+*/
 void print_mac(void) {
     uint8_t mac[6];
     esp_wifi_get_mac(WIFI_IF_STA, mac);
@@ -62,6 +70,11 @@ void print_mac(void) {
              mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
 }
 
+/*
+@brief ESP-NOW send callback
+@param mac_addr The MAC address of the receiver
+@param status The send status (success or fail)
+*/
 static void onDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
     if (status == ESP_NOW_SEND_SUCCESS) {
         receiverConnected = true;
@@ -97,6 +110,9 @@ void initESPNow(void) {
     print_mac();
 }
 
+/*
+@brief Scans the I2C bus for connected devices and logs their addresses
+*/
 void scanI2CDevices() {
     uint8_t devices[128];
     int numDevices = 0;
@@ -118,5 +134,83 @@ void scanI2CDevices() {
     ESP_LOGI(I2C_TAG, "I2C Devices Found: %d", numDevices);
     for (int i = 0; i < numDevices; i++) {
         ESP_LOGI(I2C_TAG, " - Address: 0x%02X", devices[i]);
+    }
+}
+
+/*
+@brief Initializes UART for communication with the left controller
+*/
+void initUart() {
+    const uart_config_t uart_config = {
+        .baud_rate = 115200,
+        .data_bits = UART_DATA_8_BITS,
+        .parity    = UART_PARITY_DISABLE,
+        .stop_bits = UART_STOP_BITS_1,
+        .flow_ctrl = UART_HW_FLOWCTRL_DISABLE,
+        .source_clk = UART_SCLK_APB,
+    };
+
+    uart_driver_install(UART_NUM, UART_BUF_SIZE, 0, 0, NULL, 0);
+    uart_param_config(UART_NUM, &uart_config);
+    uart_set_pin(UART_NUM, TX1, RX1, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
+}
+
+/*
+@brief Calculates the checksum for a LeftPacket
+@param pkt Pointer to the LeftPacket
+@return Calculated checksum byte
+*/
+uint8_t calcChecksum(const LeftPacket *pkt) {
+    const uint8_t *data = (const uint8_t *)pkt;
+    uint8_t cs = 0;
+    for (size_t i = 0; i < sizeof(LeftPacket) - 1; i++) {
+        cs ^= data[i];
+    }
+    return cs;
+}
+
+/*
+@brief Requests data from the left controller via UART
+*/
+void request_left_controller(void) {
+    uint8_t cmd = 0x01;
+    uart_write_bytes(UART_NUM, &cmd, 1);
+}
+
+/*
+@brief UART receive loop to read data from the left controller
+*/
+void uart_loop(void) {
+    uint8_t byte;
+
+    while (uart_read_bytes(UART_NUM, &byte, 1, 0) > 0) {
+
+        if (!receiving) {
+            if (byte == START_BYTE) {
+                receiving = true;
+                packet_index = 0;
+                ((uint8_t *)&leftPacket)[packet_index++] = byte;
+            }
+            continue;
+        }
+
+        ((uint8_t *)&leftPacket)[packet_index++] = byte;
+
+        if (packet_index == sizeof(LeftPacket)) {
+            receiving = false;
+
+            uint8_t expected = calcChecksum(&leftPacket);
+            if (expected == leftPacket.checksum) {
+                controlPacket.joystick1X = leftPacket.joy_x;
+                controlPacket.joystick1Y = leftPacket.joy_y;
+            } else {
+                ESP_LOGW("UART", "Checksum error");
+            }
+        }
+
+        if (packet_index > sizeof(LeftPacket)) {
+            receiving = false;
+            packet_index = 0;
+        }
     }
 }
