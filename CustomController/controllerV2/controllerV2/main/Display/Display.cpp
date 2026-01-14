@@ -12,6 +12,8 @@ lv_obj_t * BAT_Volts;
 lv_obj_t * Board_angle;
 lv_obj_t * RTC_Time;
 lv_obj_t * Wireless_Scan;
+lv_obj_t * Joy1;
+lv_obj_t * Dpad;
 
 static lv_obj_t *battery_icon;
 static lv_obj_t *battery_percent;
@@ -490,6 +492,38 @@ void debugPage(lv_obj_t * parent) {
 
     lv_obj_set_style_text_font(Wireless_label, &lv_font_montserrat_24, 0);
     lv_obj_set_style_text_font(Wireless_Scan, &lv_font_montserrat_24, 0);
+
+    // Joystick
+    cont = lv_menu_cont_create(debug_page);
+    lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_ROW);
+    lv_obj_set_flex_align(cont, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+
+    lv_obj_t * Joy_label = lv_label_create(cont);
+    lv_label_set_text(Joy_label, "Joystick1");
+
+    Joy1 = lv_textarea_create(cont);
+    lv_textarea_set_one_line(Joy1, true);
+    lv_textarea_set_placeholder_text(Joy1, "Joy1 X/Y/btn");
+    lv_obj_add_event_cb(Joy1, ta_event_cb, LV_EVENT_ALL, NULL);
+
+    lv_obj_set_style_text_font(Joy_label, &lv_font_montserrat_24, 0);
+    lv_obj_set_style_text_font(Joy1, &lv_font_montserrat_24, 0);
+
+    // Dpad
+    cont = lv_menu_cont_create(debug_page);
+    lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_ROW);
+    lv_obj_set_flex_align(cont, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+
+    lv_obj_t * Dpad_label = lv_label_create(cont);
+    lv_label_set_text(Dpad_label, "Dpad");
+
+    Dpad = lv_textarea_create(cont);
+    lv_textarea_set_one_line(Dpad, true);
+    lv_textarea_set_placeholder_text(Dpad, "Dpad up/down/left/right");
+    lv_obj_add_event_cb(Dpad, ta_event_cb, LV_EVENT_ALL, NULL);
+
+    lv_obj_set_style_text_font(Dpad_label, &lv_font_montserrat_24, 0);
+    lv_obj_set_style_text_font(Dpad, &lv_font_montserrat_24, 0);
 }
 
 void menuPage() {
@@ -588,6 +622,10 @@ void debugInfo(lv_timer_t * timer){
     else
         snprintf(buf, sizeof(buf), "WIFI: %d    BLE: %d\r\n",WIFI_NUM,BLE_NUM);
     lv_textarea_set_placeholder_text(Wireless_Scan, buf);
+    snprintf(buf, sizeof(buf), "X:%d  Y:%d  Btn:%d\r\n", leftPacket.joy_x , leftPacket.joy_y, leftPacket.buttons & BTN_JOY);
+    lv_textarea_set_placeholder_text(Joy1, buf);
+    snprintf(buf, sizeof(buf), "U:%d D:%d L:%d R:%d\r\n", (leftPacket.buttons & BTN_UP) != 0 , (leftPacket.buttons & BTN_DOWN) != 0 , (leftPacket.buttons & BTN_LEFT) != 0 , (leftPacket.buttons & BTN_RIGHT) != 0 );
+    lv_textarea_set_placeholder_text(Dpad, buf);
 }
 
 void homeInfo(lv_timer_t * timer){
