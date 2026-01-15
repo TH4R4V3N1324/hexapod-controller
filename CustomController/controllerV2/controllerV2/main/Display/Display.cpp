@@ -14,6 +14,8 @@ lv_obj_t * RTC_Time;
 lv_obj_t * Wireless_Scan;
 lv_obj_t * Joy1;
 lv_obj_t * Dpad;
+lv_obj_t * Joy2;
+lv_obj_t * Encoder;
 
 static lv_obj_t *battery_icon;
 static lv_obj_t *battery_percent;
@@ -421,6 +423,8 @@ void debugPage(lv_obj_t * parent) {
     row("Wireless", "Wireless number", Wireless_Scan);
     row("Joystick1", "Joy1 X/Y/btn", Joy1);
     row("Dpad", "Dpad up/down/left/right", Dpad);
+    row("Joystick2", "Joy2 X/Y/btn", Joy2);
+    row("Encoder", "Encoder value/btn", Encoder);
 }
 
 void menuPage() {
@@ -523,6 +527,10 @@ void debugInfo(lv_timer_t * timer){
     lv_textarea_set_placeholder_text(Joy1, buf);
     snprintf(buf, sizeof(buf), "U:%d D:%d L:%d R:%d\r\n", (leftPacket.buttons & BTN_UP) != 0 , (leftPacket.buttons & BTN_DOWN) != 0 , (leftPacket.buttons & BTN_LEFT) != 0 , (leftPacket.buttons & BTN_RIGHT) != 0 );
     lv_textarea_set_placeholder_text(Dpad, buf);
+    snprintf(buf, sizeof(buf), "X:%d  Y:%d  Btn:%d\r\n", rightPacket.joy_x , rightPacket.joy_y, rightPacket.joy_btn);
+    lv_textarea_set_placeholder_text(Joy2, buf);
+    snprintf(buf, sizeof(buf), "Enc:%d  Btn:%d\r\n", rightPacket.enc_count , rightPacket.enc_btn);
+    lv_textarea_set_placeholder_text(Encoder, buf);
 }
 
 void homeInfo(lv_timer_t * timer){

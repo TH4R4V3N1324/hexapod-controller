@@ -60,10 +60,10 @@ void app_main(void)
     while (1) {
         vTaskDelay(pdMS_TO_TICKS(10));
         sendData();
-        request_left_controller();
-        left_controller_loop();
-        request_right_controller();
-        right_controller_loop();
+        request_controller(&left_ctrl);
+        uart_receive_loop(&left_ctrl, "UART1");
+        request_controller(&right_ctrl);
+        uart_receive_loop(&right_ctrl, "UART2");
         lv_timer_handler();
     }
 }

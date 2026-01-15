@@ -15,6 +15,22 @@ bool left_receiving = false;
 uint8_t right_packet_index = 0;
 bool right_receiving = false;
 
+UARTController left_ctrl = {
+    .packet = &leftPacket,
+    .packet_size = sizeof(LeftPacket),
+    .receiving = false,
+    .index = 0,
+    .request_cmd = 0x01
+};
+
+UARTController right_ctrl = {
+    .packet = &rightPacket,
+    .packet_size = sizeof(RightPacket),
+    .receiving = false,
+    .index = 0,
+    .request_cmd = 0x02
+};
+
 // Define the global packet variables
 ControlPacket controlPacket = {
     .joystick1X = 0,
@@ -159,97 +175,54 @@ void initUart() {
 }
 
 /*
-@brief Requests data from the left controller via UART
+@brief Sends a request command to the specified UART controller
+@param ctrl Pointer to the UARTController struct
 */
-void request_left_controller(void) {
-    uint8_t cmd = 0x01;
-    uart_write_bytes(UART_NUM, &cmd, 1);
+void request_controller(UARTController *ctrl) {
+    uart_write_bytes(UART_NUM, &ctrl->request_cmd, 1);
 }
 
 /*
-@brief UART receive loop to read data from the left controller
+@brief Handles receiving data from the specified UART controller
+@param ctrl Pointer to the UARTController struct
+@param log_tag Tag for logging
 */
-void left_controller_loop(void) {
+void uart_receive_loop(UARTController *ctrl, const char *log_tag) {
     uint8_t byte;
 
-    while (uart_read_bytes(UART_NUM, &byte, 1, 0) > 0) {
+    while(uart_read_bytes(UART_NUM, &byte, 1, 0) > 0) {
 
-        if (!left_receiving) {
-            if (byte == START_BYTE) {
-                left_receiving = true;
-                left_packet_index = 0;
-                ((uint8_t *)&leftPacket)[left_packet_index++] = byte;
+        // Waiting for START_BYTE
+        if(!ctrl->receiving) {
+            if(byte == START_BYTE) {
+                ctrl->receiving = true;
+                ctrl->index = 0;
+                ((uint8_t*)ctrl->packet)[ctrl->index++] = byte;
             }
             continue;
         }
 
-        ((uint8_t *)&leftPacket)[left_packet_index++] = byte;
+        // Receiving packet
+        ((uint8_t*)ctrl->packet)[ctrl->index++] = byte;
 
-        if (left_packet_index == sizeof(LeftPacket)) {
-            left_receiving = false;
+        // Packet complete
+        if(ctrl->index == ctrl->packet_size) {
+            ctrl->receiving = false;
 
-            const uint8_t *data = (const uint8_t *)&leftPacket;
+            // Calculate checksum
+            const uint8_t *data = (const uint8_t*)ctrl->packet;
             uint8_t cs = 0;
-            for (size_t i = 0; i < sizeof(LeftPacket) - 1; i++) {
-                cs ^= data[i];
-            }
+            for(size_t i = 0; i < ctrl->packet_size - 1; i++) cs ^= data[i];
 
-            if (cs == leftPacket.checksum) {
-                controlPacket.joystick1X = leftPacket.joy_x;
-                controlPacket.joystick1Y = leftPacket.joy_y;
-            } else {
-                ESP_LOGW("UART1", "Checksum error");
-            }
+            uint8_t packet_cs = ((uint8_t*)ctrl->packet)[ctrl->packet_size - 1];
+
+            if(cs != packet_cs) ESP_LOGW(log_tag, "Checksum error");
         }
 
-        if (left_packet_index > sizeof(LeftPacket)) {
-            left_receiving = false;
-            left_packet_index = 0;
-        }
-    }
-}
-
-void request_right_controller(void) {
-    uint8_t cmd = 0x02;
-    uart_write_bytes(UART_NUM, &cmd, 1);
-}
-
-void right_controller_loop(void) {
-    uint8_t byte;
-
-    while (uart_read_bytes(UART_NUM, &byte, 1, 0) > 0) {
-
-        if (!right_receiving) {
-            if (byte == START_BYTE) {
-                right_receiving = true;
-                right_packet_index = 0;
-                ((uint8_t *)&rightPacket)[right_packet_index++] = byte;
-            }
-            continue;
-        }
-
-        ((uint8_t *)&rightPacket)[right_packet_index++] = byte;
-
-        if (right_packet_index == sizeof(RightPacket)) {
-            right_receiving = false;
-
-            const uint8_t *data = (const uint8_t *)&rightPacket;
-            uint8_t cs = 0;
-            for (size_t i = 0; i < sizeof(RightPacket) - 1; i++) {
-                cs ^= data[i];
-            }
-
-            if (cs == rightPacket.checksum) {
-                controlPacket.joystick2X = rightPacket.joy_x;
-                controlPacket.joystick2Y = rightPacket.joy_y;
-            } else {
-                ESP_LOGW("UART2", "Checksum error");
-            }
-        }
-
-        if (right_packet_index > sizeof(RightPacket)) {
-            right_receiving = false;
-            right_packet_index = 0;
+        // Overflow safety
+        if(ctrl->index > ctrl->packet_size) {
+            ctrl->receiving = false;
+            ctrl->index = 0;
         }
     }
 }

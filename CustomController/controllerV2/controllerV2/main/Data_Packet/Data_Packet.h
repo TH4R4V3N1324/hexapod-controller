@@ -15,7 +15,7 @@
 #include "driver/i2c.h"
 #include "driver/uart.h"
 
-#define I2C_MASTER_NUM I2C_NUM_0 // Use I2C_NUM_0 to match i2c_port_t type
+#define I2C_MASTER_NUM I2C_NUM_0
 
 #define UART_NUM UART_NUM_1
 #define RX1 44
@@ -82,6 +82,14 @@ typedef struct __attribute__((packed)) {
 #define BTN_LEFT  (1 << 3)
 #define BTN_RIGHT (1 << 4)
 
+typedef struct {
+    void *packet;              // Pointer to packet struct (LeftPacket / RightPacket)
+    size_t packet_size;        // Size of the packet
+    bool receiving;            // Are we currently receiving a packet?
+    size_t index;              // Current byte index
+    uint8_t request_cmd;       // Command to request this controller
+} UARTController;
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -91,15 +99,15 @@ extern HexPacket hexPacket;
 extern LeftPacket leftPacket;
 extern RightPacket rightPacket;
 extern bool receiverConnected;
+extern UARTController left_ctrl;
+extern UARTController right_ctrl;
 
 void sendData();
 void initESPNow();
 void scanI2CDevices();
 void initUart();
-void request_left_controller();
-void left_controller_loop(void);
-void request_right_controller();
-void right_controller_loop(void);
+void request_controller(UARTController *ctrl);
+void uart_receive_loop(UARTController *ctrl, const char *log_tag);
 
 #ifdef __cplusplus
 }
