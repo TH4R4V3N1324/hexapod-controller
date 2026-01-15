@@ -248,6 +248,16 @@ void uart_receive_loop(UARTController *ctrl, const char *log_tag) {
     for (size_t i = 0; i < needed - 1; i++) cs ^= buf[i];
     uint8_t packet_cs = buf[needed - 1];
     if (cs != packet_cs) {
-        ESP_LOGW(log_tag, "Checksum error");
+        ESP_LOGW(log_tag, "Checksum error: calculated 0x%02X, received 0x%02X", cs, packet_cs);
+        return;
+    }
+
+    // Assign joystick values to controlPacket
+    if (ctrl->request_cmd == 0x01) {
+        controlPacket.joystick1X = leftPacket.joy_x;
+        controlPacket.joystick1Y = leftPacket.joy_y;
+    } else if (ctrl->request_cmd == 0x02) {
+        controlPacket.joystick2X = rightPacket.joy_x;
+        controlPacket.joystick2Y = rightPacket.joy_y;
     }
 }
