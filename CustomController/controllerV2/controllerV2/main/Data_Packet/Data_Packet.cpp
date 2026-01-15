@@ -179,7 +179,9 @@ void initUart() {
 @param ctrl Pointer to the UARTController struct
 */
 void request_controller(UARTController *ctrl) {
+    uart_flush_input(UART_NUM);
     uart_write_bytes(UART_NUM, &ctrl->request_cmd, 1);
+    uart_wait_tx_done(UART_NUM, pdMS_TO_TICKS(5));
 }
 
 /*
@@ -188,41 +190,37 @@ void request_controller(UARTController *ctrl) {
 @param log_tag Tag for logging
 */
 void uart_receive_loop(UARTController *ctrl, const char *log_tag) {
-    uint8_t byte;
+    // Read exactly one packet for this controller (don't drain FIFO)
+    uint8_t *buf = (uint8_t *)ctrl->packet;
+    size_t needed = ctrl->packet_size;
+    uint8_t b;
 
-    while(uart_read_bytes(UART_NUM, &byte, 1, 0) > 0) {
+    // Wait for START_BYTE with 20ms timeout
+    if (uart_read_bytes(UART_NUM, &b, 1, pdMS_TO_TICKS(20)) <= 0) {
+        return; // No response from this board
+    }
+    if (b != START_BYTE) {
+        return; // Unexpected byte; skip
+    }
+    buf[0] = b;
 
-        // Waiting for START_BYTE
-        if(!ctrl->receiving) {
-            if(byte == START_BYTE) {
-                ctrl->receiving = true;
-                ctrl->index = 0;
-                ((uint8_t*)ctrl->packet)[ctrl->index++] = byte;
-            }
-            continue;
+    // Read the rest of the packet with bounded waits
+    size_t idx = 1;
+    size_t to_read = needed - 1;
+    while (to_read > 0) {
+        int got = uart_read_bytes(UART_NUM, buf + idx, to_read, pdMS_TO_TICKS(20));
+        if (got <= 0) {
+            return; // Timeout or incomplete frame
         }
+        idx += got;
+        to_read -= got;
+    }
 
-        // Receiving packet
-        ((uint8_t*)ctrl->packet)[ctrl->index++] = byte;
-
-        // Packet complete
-        if(ctrl->index == ctrl->packet_size) {
-            ctrl->receiving = false;
-
-            // Calculate checksum
-            const uint8_t *data = (const uint8_t*)ctrl->packet;
-            uint8_t cs = 0;
-            for(size_t i = 0; i < ctrl->packet_size - 1; i++) cs ^= data[i];
-
-            uint8_t packet_cs = ((uint8_t*)ctrl->packet)[ctrl->packet_size - 1];
-
-            if(cs != packet_cs) ESP_LOGW(log_tag, "Checksum error");
-        }
-
-        // Overflow safety
-        if(ctrl->index > ctrl->packet_size) {
-            ctrl->receiving = false;
-            ctrl->index = 0;
-        }
+    // Verify checksum (XOR of all bytes except last)
+    uint8_t cs = 0;
+    for (size_t i = 0; i < needed - 1; i++) cs ^= buf[i];
+    uint8_t packet_cs = buf[needed - 1];
+    if (cs != packet_cs) {
+        ESP_LOGW(log_tag, "Checksum error");
     }
 }
