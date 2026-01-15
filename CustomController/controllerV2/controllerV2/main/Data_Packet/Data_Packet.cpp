@@ -172,6 +172,33 @@ void initUart() {
     uart_driver_install(UART_NUM, UART_BUF_SIZE, 0, 0, NULL, 0);
     uart_param_config(UART_NUM, &uart_config);
     uart_set_pin(UART_NUM, TX1, RX1, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
+
+    // Test board connectivity at startup
+    vTaskDelay(pdMS_TO_TICKS(100));
+    
+    // Test left board
+    request_controller(&left_ctrl);
+    vTaskDelay(pdMS_TO_TICKS(10));
+    uart_receive_loop(&left_ctrl, "LEFT_BOARD");
+    uint8_t *left_buf = (uint8_t *)&leftPacket;
+    if (left_buf[0] == START_BYTE) {
+        ESP_LOGI("UART_INIT", "✓ Left board (0x01) connected");
+    } else {
+        ESP_LOGW("UART_INIT", "✗ Left board (0x01) NOT connected");
+    }
+    
+    vTaskDelay(pdMS_TO_TICKS(10));
+    
+    // Test right board
+    request_controller(&right_ctrl);
+    vTaskDelay(pdMS_TO_TICKS(10));
+    uart_receive_loop(&right_ctrl, "RIGHT_BOARD");
+    uint8_t *right_buf = (uint8_t *)&rightPacket;
+    if (right_buf[0] == START_BYTE) {
+        ESP_LOGI("UART_INIT", "✓ Right board (0x02) connected");
+    } else {
+        ESP_LOGW("UART_INIT", "✗ Right board (0x02) NOT connected");
+    }
 }
 
 /*
