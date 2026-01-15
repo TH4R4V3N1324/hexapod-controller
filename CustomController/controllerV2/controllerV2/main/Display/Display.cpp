@@ -523,13 +523,13 @@ void debugInfo(lv_timer_t * timer){
     else
         snprintf(buf, sizeof(buf), "WIFI: %d    BLE: %d\r\n",WIFI_NUM,BLE_NUM);
     lv_textarea_set_placeholder_text(Wireless_Scan, buf);
-    snprintf(buf, sizeof(buf), "X:%d  Y:%d  Btn:%d\r\n", leftPacket.joy_x , leftPacket.joy_y, leftPacket.buttons & BTN_JOY);
+    snprintf(buf, sizeof(buf), "X:%d  Y:%d  B:%d\r\n", leftPacket.joy_x , leftPacket.joy_y, leftPacket.buttons & BTN_JOY);
     lv_textarea_set_placeholder_text(Joy1, buf);
     snprintf(buf, sizeof(buf), "U:%d D:%d L:%d R:%d\r\n", (leftPacket.buttons & BTN_UP) != 0 , (leftPacket.buttons & BTN_DOWN) != 0 , (leftPacket.buttons & BTN_LEFT) != 0 , (leftPacket.buttons & BTN_RIGHT) != 0 );
     lv_textarea_set_placeholder_text(Dpad, buf);
-    snprintf(buf, sizeof(buf), "X:%d  Y:%d  Btn:%d\r\n", rightPacket.joy_x , rightPacket.joy_y, rightPacket.joy_btn);
+    snprintf(buf, sizeof(buf), "X:%d  Y:%d  B:%d\r\n", rightPacket.joy_x , rightPacket.joy_y, rightPacket.joy_btn);
     lv_textarea_set_placeholder_text(Joy2, buf);
-    snprintf(buf, sizeof(buf), "Enc:%d  Btn:%d\r\n", rightPacket.enc_count , rightPacket.enc_btn);
+    snprintf(buf, sizeof(buf), "C:%d  B:%d\r\n", rightPacket.enc_count , rightPacket.enc_btn);
     lv_textarea_set_placeholder_text(Encoder, buf);
 }
 
