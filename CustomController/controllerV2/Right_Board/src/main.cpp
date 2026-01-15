@@ -12,7 +12,7 @@ void loop() {
     if (Serial.available()) {
         uint8_t cmd = Serial.read();
 
-        if (cmd == 0x01) {               // REQUEST_INPUT
+        if (cmd == 0x02) {               // REQUEST_INPUT
             input.readInput();
             dataPacket.sendInputPacket();
         }

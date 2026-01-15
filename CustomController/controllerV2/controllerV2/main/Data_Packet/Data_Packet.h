@@ -55,13 +55,24 @@ typedef struct {
 #pragma pack(pop)
 
 typedef struct __attribute__((packed)) {
-    uint8_t start;     // START_BYTE (0xAA)
-    uint8_t version;   // Protocol version
+    uint8_t start;    
+    uint8_t version;  
     int16_t joy_x;
     int16_t joy_y;
-    uint8_t buttons;   // bitfield (see below)
+    uint8_t buttons; 
     uint8_t checksum;
 } LeftPacket;
+
+typedef struct __attribute__((packed)) {
+    uint8_t start;
+    uint8_t version; 
+    int16_t joy_x;
+    int16_t joy_y;
+    int8_t joy_btn;
+    int16_t enc_count;
+    uint8_t enc_btn;
+    uint8_t checksum;
+} RightPacket;
 
 #define START_BYTE 0xAA
 
@@ -78,6 +89,7 @@ extern "C" {
 extern ControlPacket controlPacket;
 extern HexPacket hexPacket;
 extern LeftPacket leftPacket;
+extern RightPacket rightPacket;
 extern bool receiverConnected;
 
 void sendData();
@@ -85,7 +97,9 @@ void initESPNow();
 void scanI2CDevices();
 void initUart();
 void request_left_controller();
-void uart_loop(void);
+void left_controller_loop(void);
+void request_right_controller();
+void right_controller_loop(void);
 
 #ifdef __cplusplus
 }

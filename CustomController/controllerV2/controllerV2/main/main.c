@@ -60,8 +60,10 @@ void app_main(void)
     while (1) {
         vTaskDelay(pdMS_TO_TICKS(10));
         sendData();
-        request_left_controller();
-        uart_loop();
+        //request_left_controller();
+        //left_controller_loop();
+        request_right_controller();
+        right_controller_loop();
         lv_timer_handler();
     }
 }
