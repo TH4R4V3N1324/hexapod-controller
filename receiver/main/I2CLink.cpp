@@ -61,6 +61,11 @@ void i2cTask(void*) {
         const bool done = ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(RELOAD_MS)) > 0;
         if (done) {
             if (wasWrite()) {
+                // A Servo 2040 on another protocol version is ignored (its status, not its reads)
+                if (rxBuffer[0] != HEXAPOD_PROTOCOL_VERSION) {
+                    arm();
+                    continue;
+                }
                 HexPacket status;
                 memcpy(&status, rxBuffer, sizeof(status));
                 link::setStatus(status);

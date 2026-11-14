@@ -1,7 +1,7 @@
 #include "DataPacket.h"
 
 // Define global packets
-ControlPacket controlPacket = {};
+ControlPacket controlPacket = {HEXAPOD_PROTOCOL_VERSION};
 HexPacket hexPacket = {};
 DataPacket dataPacket;
 
@@ -25,7 +25,8 @@ void DataPacket::sendData() {
 */
 void DataPacket::onHexDataReceived(const uint8_t *mac, const uint8_t *data, int len) {
 	static bool firstPacket = true;
-	if (len == sizeof(HexPacket)) {
+	// Anything else is from a robot on another hexapod-gait-core version
+	if (len == sizeof(HexPacket) && data[0] == HEXAPOD_PROTOCOL_VERSION) {
 		memcpy(&hexPacket, data, sizeof(HexPacket));
 		if (firstPacket) {
 			controlPacket.currentHeight = hexPacket.currentHeight;

@@ -2,7 +2,7 @@
 #ifndef RECEIVER_GAMEPAD_H
 #define RECEIVER_GAMEPAD_H
 #include <stdint.h>
-#include "HexapodPackets.h"
+#include <hexapod_protocol/packets.h>
 
 struct uni_platform;
 

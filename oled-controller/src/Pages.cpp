@@ -81,9 +81,7 @@ void Pages::homePage() {
 	// Phase
 	u8g2.setFont(u8g2_font_4x6_mf);
 	u8g2.drawStr(3, 40, "Phase");
-	char currentPhaseStr[10];
-	sprintf(currentPhaseStr, "%d", hexPacket.currentPhase);
-	u8g2.drawStr(36, 40, currentPhaseStr);
+	u8g2.drawStr(36, 40, (hexPacket.flags & HEX_FLAG_SEATED) ? "sit" : "up");
 	
 	// Height
 	u8g2.setFont(u8g2_font_4x6_mf);

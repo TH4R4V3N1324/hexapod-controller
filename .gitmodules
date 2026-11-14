@@ -6,3 +6,7 @@
 	path = external/bluepad32
 	url = https://github.com/ricardoquesada/bluepad32.git
 	shallow = true
+[submodule "external/hexapod-gait-core"]
+	path = external/hexapod-gait-core
+	url = https://github.com/TH4R4V3N1324/hexapod-gait-core.git
+	shallow = true

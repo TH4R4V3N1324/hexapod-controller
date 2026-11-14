@@ -22,7 +22,12 @@ struct Input {
 
 Input controller = {};
 Input gamepad = {};
-ControlPacket output = {};   // what the robot reads
+// What the robot reads; stamped with the version from the start, for the I2C slave's first load
+ControlPacket output = [] {
+    ControlPacket p = {};
+    p.version = HEXAPOD_PROTOCOL_VERSION;
+    return p;
+}();
 HexPacket robotStatus = {};
 Source active = SOURCE_NONE;
 
@@ -85,7 +90,9 @@ Source update(uint32_t nowMs) {
     } else if (active == SOURCE_GAMEPAD) {
         output = gamepad.packet;
     } else {
+        output.version = HEXAPOD_PROTOCOL_VERSION;
         output.joystick1X = output.joystick1Y = output.joystick2X = output.joystick2Y = 0;
+        output.tiltYaw = output.tiltZ = 0;
         output.command = CMD_NONE;
         memset(output.commandArgs, 0, sizeof(output.commandArgs));
         // currentHeight kept, so the robot doesn't drop

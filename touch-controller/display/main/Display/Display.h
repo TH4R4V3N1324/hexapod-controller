@@ -28,7 +28,7 @@ struct page {
 };
 
 enum Joints {coxa, femur, tibia};
-// Gait and Mode come from common/HexapodPackets.h (through Data_Packet.h)
+// Gait and Mode come from hexapod-gait-core's protocol header (through Data_Packet.h)
 
 void homePage();
 void menuPage();

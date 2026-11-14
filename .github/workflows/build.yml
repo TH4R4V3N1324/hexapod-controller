@@ -11,6 +11,8 @@ jobs:
         project: [oled-controller, touch-controller/left-board, touch-controller/right-board]
     steps:
       - uses: actions/checkout@v7
+        with:
+          submodules: true   # hexapod-gait-core: the packet header
       - uses: actions/setup-python@v6
         with:
           python-version: 3.x
@@ -35,7 +37,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
-          submodules: recursive   # LVGL, Bluepad32 and the BTstack inside it
+          submodules: recursive   # gait-core, LVGL, Bluepad32 and the BTstack inside it
       - uses: espressif/esp-idf-ci-action@v1
         with:
           esp_idf_version: v5.3.4

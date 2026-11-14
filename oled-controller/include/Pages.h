@@ -3,7 +3,7 @@
 
 #include "bitmaps.h"
 #include "Input.h"
-#include "HexapodPackets.h"
+#include <hexapod_protocol/packets.h>
 
 // Main FSM states, matches availble pages
 enum States {
@@ -26,7 +26,7 @@ struct page {
 };
 
 enum Joints {coxa, femur, tibia};
-// Gait and Mode come from common/HexapodPackets.h, so the values match the robot's
+// Gait and Mode come from hexapod-gait-core's protocol header, so the values match the robot's
 
 class Pages {
 private:

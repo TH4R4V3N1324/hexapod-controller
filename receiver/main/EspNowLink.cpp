@@ -43,7 +43,7 @@ void onReceive(const esp_now_recv_info_t* info, const uint8_t* data, int len) {
     const uint8_t* mac = info->src_addr;
 
     if (hasController && memcmp(mac, config::CONTROLLER_MAC, 6) == 0) {
-        if (len != sizeof(ControlPacket)) {
+        if (len != sizeof(ControlPacket) || data[0] != HEXAPOD_PROTOCOL_VERSION) {
             badLength = len;
             return;
         }
@@ -57,7 +57,7 @@ void onReceive(const esp_now_recv_info_t* info, const uint8_t* data, int len) {
 
     if (hasRobot && memcmp(mac, config::ROBOT_MAC, 6) == 0) {
         // The robot's reply to a relayed ControlPacket
-        if (len == sizeof(HexPacket)) {
+        if (len == sizeof(HexPacket) && data[0] == HEXAPOD_PROTOCOL_VERSION) {
             HexPacket status;
             memcpy(&status, data, sizeof(status));
             link::setStatus(status);
@@ -138,9 +138,9 @@ void report() {
     const int len = badLength;
     if (len >= 0) {
         badLength = -1;
-        printf("Ignored a %d-byte ESP-NOW packet (expected %u from the controller, %u from the robot): "
-               "is HexapodPackets.h the same at both ends?\n",
-               len, (unsigned)sizeof(ControlPacket), (unsigned)sizeof(HexPacket));
+        printf("Ignored a %d-byte ESP-NOW packet (expected %u from the controller, %u from the robot, "
+               "version %d): is hexapod-gait-core the same version at both ends?\n",
+               len, (unsigned)sizeof(ControlPacket), (unsigned)sizeof(HexPacket), HEXAPOD_PROTOCOL_VERSION);
     }
 }
 

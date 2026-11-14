@@ -33,10 +33,13 @@ UARTController right_ctrl = {
 
 // Define the global packet variables
 ControlPacket controlPacket = {
+    .version = HEXAPOD_PROTOCOL_VERSION,
     .joystick1X = 0,
     .joystick1Y = 0,
     .joystick2X = 0,
     .joystick2Y = 0,
+    .tiltYaw = 0,
+    .tiltZ = 0,
     .currentHeight = 0,
     .command = CMD_NONE,
     .commandArgs = {0, 0, 0}
@@ -69,7 +72,8 @@ void sendData() {
 */
 static void onHexDataReceived(const esp_now_recv_info_t *recv_info, const uint8_t *data, int len) {
 	static bool firstPacket = true;
-	if (len == sizeof(HexPacket)) {
+	// Anything else is from a robot on another hexapod-gait-core version
+	if (len == sizeof(HexPacket) && data[0] == HEXAPOD_PROTOCOL_VERSION) {
 		memcpy(&hexPacket, data, sizeof(HexPacket));
 		if (firstPacket) {
 			controlPacket.currentHeight = hexPacket.currentHeight;

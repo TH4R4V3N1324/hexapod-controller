@@ -34,8 +34,10 @@ redesign and has no published PCB.
 git clone --recursive https://github.com/TH4R4V3N1324/hexapod-controller.git
 ```
 
-`--recursive` fetches the submodules: LVGL for the touch controller, and Bluepad32 with the BTstack
-inside it for the receiver. In an existing clone, run `git submodule update --init --recursive`.
+`--recursive` fetches the submodules: hexapod-gait-core for the packets and gamepad layout, LVGL
+for the touch controller, and Bluepad32 with the BTstack inside it for the receiver. (It also fetches
+gait-core's own Eigen submodule, which isn't used here.) In an existing clone, run
+`git submodule update --init --recursive`.
 
 The OLED controller uses [PlatformIO](https://platformio.org/) (the VS Code extension or the CLI),
 pinned to the `espressif32` platform 6.11.0 (Arduino-ESP32 2.0.17), the same as hexapod-esp32:
@@ -83,9 +85,9 @@ S3 and C3 have only BLE, which leaves out PlayStation and Switch Pro controllers
 ## Repository layout
 
 ```text
-common/
-  HexapodPackets.h     ControlPacket, HexPacket, Command, Gait, Mode: shared with the robot firmware
 external/
+  hexapod-gait-core/   Submodule: the packets (hexapod_protocol/) and gamepad layout (hexapod_teleop/)
+                       every stack shares; only those two headers are used here
   lvgl/                Submodule, LVGL v8.4.0 (touch controller)
   bluepad32/           Submodule, Bluepad32 4.2.0, with BTstack inside it (receiver)
 oled-controller/       OLED controller (ESP32-S2, PCB rev v3)
@@ -150,75 +152,78 @@ Bluepad32 supports, among others, DualShock 4, DualSense, Xbox Wireless (control
 Bluetooth, on firmware 5.x), Switch Pro, Joy-Con, 8BitDo, Stadia and generic BLE gamepads. See its
 [supported controllers](https://bluepad32.readthedocs.io/en/latest/supported_gamepads/).
 
-The layout matches the ROS 2 stack's `controller_teleop`
-([ROS 2 > Driving](https://github.com/TH4R4V3N1324/hexapod-docs/blob/main/docs/stacks/ros2/driving.md#gamepad-controls)),
-so one gamepad drives every robot the same way. Buttons are named Xbox-first, with PlayStation in
-brackets; Bluepad32 names them by position, so a Switch or 8BitDo gamepad uses the same places.
+The layout is hexapod-gait-core's `hexapod_teleop::GamepadTeleop`, the same code ROS 2's
+`controller_teleop` runs, so one gamepad drives every robot the same way
+([ROS 2 > Driving](https://github.com/TH4R4V3N1324/hexapod-docs/blob/main/docs/stacks/ros2/driving.md#gamepad-controls)).
+Buttons are named Xbox-first, with PlayStation in brackets; Bluepad32 names them by position, so a
+Switch or 8BitDo gamepad uses the same places.
 
-| Input | Walking (normal / strafe) | Tilt mode | Same as ROS 2 |
-|---|---|---|---|
-| Left stick | Forward/back, left/right | Shift the body forward/back, left/right | ✅ |
-| Right stick X | Turn | Roll | ✅ |
-| Right stick Y | — | Pitch (forward lowers the nose) | ✅ |
-| D-pad up / down | Body height up / down 1 cm (repeats while held) | — | ✅ walking. Tilt mode raises/lowers the body in ROS 2; not in the packet yet |
-| RB [R1] | Sit down / stand up; hold 2 s to power down | The same | ✅ (see below) |
-| Start [Options] | Next mode | Next mode | ✅ |
-| Back [Create] | Next gait | Next gait | ✅ |
-| LT / RT [L2 / R2] | — | — | ROS 2: yaw in tilt mode. Not in the packet yet |
-| A, B, X, Y | — | — | ROS 2: feature toggles. Not in the packet yet |
+| Input | Walking (normal / strafe) | Tilt mode |
+|---|---|---|
+| Left stick | Forward/back, left/right | Shift the body forward/back, left/right |
+| Right stick X | Turn | Roll |
+| Right stick Y | — | Pitch (forward lowers the nose) |
+| LT / RT [L2 / R2] | — | Yaw left / right |
+| D-pad up / down | Body height up / down 1 cm (repeats while held; not while seated) | Raise / lower the body |
+| RB [R1] | On release: sit down if standing, otherwise stand up. Held 2 s: power down instead | The same |
+| Start [Options] | Next mode | Next mode |
+| Back [Create] | Next gait | Next gait |
+| A [Cross] | Terrain adaptation on/off | The same |
+| B [Circle] | Walk leveling on/off | The same |
+| X [Square] | Load balancing on/off | The same |
+| Y [Triangle] | Tilt leveling on/off | The same |
 
-**RB** acts when released: it sits the robot down if it's standing, and stands it up otherwise
-(which also turns the servos back on). Held for 2 s it powers down instead: sit, then servo power
-off. ROS 2 knows whether the robot is seated from `/seated`, but `HexPacket` doesn't carry that, so
-the receiver follows the commands it has sent. Both robots start seated. If the robot sits by
-itself (the Servo 2040 also stands by itself 5 s after boot, and the battery behaviour can sit
-either robot), the next press does nothing and the one after works.
+The robot reports whether it's seated and which features are on (`HexPacket.flags`), so RB and the
+face buttons always do the right thing, as they do on ROS 2. The Servo 2040's hobby servos give no
+feedback, so it refuses to turn on terrain adaptation and load balancing.
 
-The **D-pad** moves the body 1 cm per step, every 0.3 s while held, within gait core's 6–16 cm. It
-does nothing while seated. Quick presses add up while the body is still moving.
-
-Each command is held for 150 ms and then cleared, so pressing the same button again counts. Config
-mode and calibration are left to the handheld controller. Step sizes, timings and the dead zone are
-in `Config.h`; the buttons are in `Gamepad::update()`.
+The D-pad moves the body 1 cm per step, every 0.3 s while held, within gait core's 6–16 cm. Quick
+presses add up while the body is still moving. Each command is held for 150 ms and then cleared, so
+pressing the same button again counts. Config mode and calibration are left to the handheld
+controller. Step sizes, timings and the dead zone are in `Config.h`; change the layout itself in
+hexapod-gait-core, so ROS 2 changes with it.
 
 When a gamepad connects it rumbles briefly, and gamepads with lights show player 1 and a blue light
 bar.
 
 ## Robot interface
 
-The packets are in [`common/HexapodPackets.h`](common/HexapodPackets.h), the only copy in this
-repo. All three projects that use them include it. It must stay byte-compatible with the robot
-firmware's `DataPacket.h` in
-[hexapod-esp32](https://github.com/TH4R4V3N1324/hexapod-esp32/blob/main/include/DataPacket.h) and
-[hexapod-servo2040](https://github.com/TH4R4V3N1324/hexapod-servo2040/blob/main/includes/DataPacket.h).
-The robot firmware is the reference. `static_assert`s on the sizes catch accidental changes.
+The packets are hexapod-gait-core's
+[`hexapod_protocol/packets.h`](https://github.com/TH4R4V3N1324/hexapod-gait-core/blob/main/include/hexapod_protocol/packets.h),
+which every controller and robot includes, so they can't drift apart. Both packets start with
+`HEXAPOD_PROTOCOL_VERSION` (2), and each end drops packets of another size or version.
 
 ```cpp
-struct ControlPacket {           // controller → robot, 17 bytes
+struct ControlPacket {           // controller → robot, 22 bytes
+    uint8_t version;             // HEXAPOD_PROTOCOL_VERSION
     int16_t joystick1X, joystick1Y, joystick2X, joystick2Y;  // ±128, X right, Y forward
+    int16_t tiltYaw;             // tilt mode: yaw, positive turns left
+    int16_t tiltZ;               // tilt mode: raise the body
     int16_t currentHeight;       // body height in mm, 0 = unchanged
     Command command;
     int16_t commandArgs[3];
 };
 
-struct HexPacket {               // robot → controller, 11 bytes, in reply to each packet
+struct HexPacket {               // robot → controller, 12 bytes, in reply to each packet
+    uint8_t version;
     int16_t legConfigs[3];       // calibration offsets requested with CMD_REQUEST_CONFIG
     int16_t currentHeight;       // mm
-    int8_t currentPhase;         // always 0
     Gait currentGait;
     Mode currentMode;
+    uint8_t flags;               // HEX_FLAG_SEATED, HEX_FLAG_SERVO_POWER, HEX_FLAG_FEATURE(f)
 };
 ```
 
-| Command | Arguments | Sent by the OLED controller |
-| --- | --- | --- |
-| `CMD_SET_GAIT` | `[0]` gait | ✅ Button 2 on the home page, or the gait page |
-| `CMD_SET_MODE` | `[0]` mode. `MODE_CONFIG` moves every joint to its centre plus its offset | ✅ Button 3 on the home page, or the mode page. Opening the config page sends `MODE_CONFIG` |
-| `CMD_SET_CONFIG` | `[0]` leg 0–5, `[1]` joint 0–2, `[2]` offset in degrees (robot clamps to ±60) | ✅ Joint page |
-| `CMD_HOME_STANCE` | Stand up | ✅ Going back from the config page to the menu |
-| `CMD_REQUEST_CONFIG` | `[0]` leg; its offsets come back in `legConfigs` | — |
-| `CMD_SIT` | `[0]` 1 sit, 0 stand | — |
-| `CMD_POWER_DOWN` | Sit down, then turn servo power off | — |
+| Command | Arguments | OLED controller | Receiver (gamepad) |
+| --- | --- | --- | --- |
+| `CMD_SET_GAIT` | `[0]` gait | Button 2 on the home page, or the gait page | Back |
+| `CMD_SET_MODE` | `[0]` mode. `MODE_CONFIG` moves every joint to its centre plus its offset | Button 3 on the home page, or the mode page. Opening the config page sends `MODE_CONFIG` | Start |
+| `CMD_SET_CONFIG` | `[0]` leg 0–5, `[1]` joint 0–2, `[2]` offset in degrees (robot clamps to ±60) | Joint page | — |
+| `CMD_HOME_STANCE` | Stand up | Going back from the config page to the menu | — |
+| `CMD_REQUEST_CONFIG` | `[0]` leg; its offsets come back in `legConfigs` | — | — |
+| `CMD_SIT` | `[0]` 1 sit, 0 stand | — | RB |
+| `CMD_POWER_DOWN` | Sit down, then turn servo power off | — | Hold RB |
+| `CMD_SET_FEATURE` | `[0]` feature (terrain adaptation, walk leveling, load balancing, tilt leveling), `[1]` 1 on, 0 off | — | A, B, X, Y |
 
 The encoder on the home page raises and lowers `currentHeight`. The robot applies a command once,
 when it or its arguments change. New commands must be appended
@@ -259,9 +264,11 @@ monitor.
 
 ## Development notes
 
-- **Packet changes start in the robot firmware.** Change `DataPacket.h` there first, then mirror
-  it in `common/HexapodPackets.h` and update the size checks. `HexapodPackets.h` has to compile as
-  C too, because the touch controller's display includes it from `main.c`.
+- **Packets and the gamepad layout live in hexapod-gait-core**, shared with both robot firmwares
+  and ROS 2. Change them there (bump `HEXAPOD_PROTOCOL_VERSION` for a packet change), release
+  gait-core, then update the `external/hexapod-gait-core` submodule here and in every other repo
+  together. The packet header has to stay valid C, because the touch controller's display includes
+  it from `main.c`.
 - **Receiver tasks:** Bluepad32 runs on BTstack's run loop in the main task; the 100 Hz loop, the
   I²C slave and the Wi-Fi (ESP-NOW) callbacks each run in their own. `Link` holds everything they
   share behind one lock. Bluepad32 isn't thread-safe, so the loop posts pairing changes to the
@@ -294,8 +301,8 @@ monitor.
 - **The robot ignores the controller:** check that the controller's `receiverMAC` is the robot's
   (or the receiver's) address. On hexapod-esp32 or the receiver, look for `Ignored a packet from
   ...` on the monitor.
-- **`Ignored a 14-byte packet` or a similar size mismatch:** one end has an old packet layout.
-  Rebuild both against the current `HexapodPackets.h` and the robot's `DataPacket.h`.
+- **`Ignored a ... packet` with a size or version mismatch:** the two ends are on different
+  hexapod-gait-core versions. Update the submodule in both and rebuild.
 - **The robot stops every few seconds:** the receiver's failsafe is tripping (`Failsafe: ...` on
   its monitor). Move the controller closer, or check it's sending every 10 ms.
 - **`Failed to resolve component 'lvgl'`**, missing `lvgl.h`, or `Bluepad32 or BTstack is
