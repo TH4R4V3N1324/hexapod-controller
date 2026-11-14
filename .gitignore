@@ -6,3 +6,4 @@ sdkconfig.old
 .venv
 receiver/sdkconfig
 receiver/sdkconfig.old
+touch-controller/display/sdkconfig
