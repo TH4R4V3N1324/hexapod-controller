@@ -1,0 +1,3 @@
+dependencies:
+  idf: ">=5.3"
+  # LVGL comes from the external/lvgl submodule (v8.4.0), not the component registry
