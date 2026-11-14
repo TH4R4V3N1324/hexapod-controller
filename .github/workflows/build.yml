@@ -8,7 +8,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        project: [oled-controller, receiver, touch-controller/left-board, touch-controller/right-board]
+        project: [oled-controller, touch-controller/left-board, touch-controller/right-board]
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v6
@@ -24,12 +24,20 @@ jobs:
 
   esp-idf:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - project: touch-controller/display
+            target: esp32s3
+          - project: receiver
+            target: esp32
     steps:
       - uses: actions/checkout@v7
         with:
-          submodules: true   # LVGL
+          submodules: recursive   # LVGL, Bluepad32 and the BTstack inside it
       - uses: espressif/esp-idf-ci-action@v1
         with:
           esp_idf_version: v5.3.4
-          target: esp32s3
-          path: touch-controller/display
+          target: ${{ matrix.target }}
+          path: ${{ matrix.project }}

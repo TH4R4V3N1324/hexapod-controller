@@ -2,3 +2,7 @@
 	path = external/lvgl
 	url = https://github.com/lvgl/lvgl.git
 	shallow = true
+[submodule "external/bluepad32"]
+	path = external/bluepad32
+	url = https://github.com/ricardoquesada/bluepad32.git
+	shallow = true

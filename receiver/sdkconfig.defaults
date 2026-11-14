@@ -1,0 +1,32 @@
+# Receiver: ESP32 (classic: Bluetooth Classic and BLE), ESP-IDF 5.3, Bluepad32 with its own BTstack.
+# Based on Bluepad32's ESP-IDF example.
+
+CONFIG_IDF_TARGET="esp32"
+CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y
+CONFIG_PARTITION_TABLE_SINGLE_APP_LARGE=y
+CONFIG_ESP_MAIN_TASK_STACK_SIZE=8192
+
+CONFIG_FREERTOS_HZ=1000
+
+# Bluetooth: only the controller; BTstack is the host. Dual mode for Classic and BLE gamepads.
+CONFIG_BT_ENABLED=y
+CONFIG_BT_CONTROLLER_ONLY=y
+CONFIG_BTDM_CTRL_MODE_BTDM=y
+# At least one more than CONFIG_BLUEPAD32_MAX_DEVICES
+CONFIG_BTDM_CTRL_BR_EDR_MAX_ACL_CONN=3
+CONFIG_BTDM_CTRL_BLE_MAX_CONN=3
+CONFIG_BTDM_CTRL_BR_EDR_MAX_SYNC_CONN=0
+CONFIG_BTDM_CTRL_AUTO_LATENCY=y
+CONFIG_BTDM_CTRL_MODEM_SLEEP=n
+CONFIG_BTSTACK_AUDIO=n
+
+# Bluepad32: our own platform (Gamepad.cpp); one gamepad drives at a time, a second can connect
+CONFIG_BLUEPAD32_PLATFORM_CUSTOM=y
+CONFIG_BLUEPAD32_MAX_DEVICES=2
+# Bluepad32's serial console isn't needed; the receiver just logs
+CONFIG_BLUEPAD32_USB_CONSOLE_ENABLE=n
+CONFIG_BLUEPAD32_ENABLE_VIRTUAL_DEVICE_BY_DEFAULT=n
+
+# Wi-Fi and Bluetooth together overflow IRAM; ESP-NOW at 100 Hz doesn't need Wi-Fi's IRAM speed-ups
+CONFIG_ESP_WIFI_IRAM_OPT=n
+CONFIG_ESP_WIFI_RX_IRAM_OPT=n
