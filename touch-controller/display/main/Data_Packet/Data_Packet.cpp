@@ -95,10 +95,11 @@ void print_mac(void) {
 
 /*
 @brief ESP-NOW send callback
-@param mac_addr The MAC address of the receiver
+@param tx_info ESP-NOW transmission information
 @param status The send status (success or fail)
 */
-static void onDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
+static void onDataSent(const esp_now_send_info_t *tx_info, esp_now_send_status_t status) {
+    (void)tx_info;
     if (status == ESP_NOW_SEND_SUCCESS) {
         receiverConnected = true;
     } else {
