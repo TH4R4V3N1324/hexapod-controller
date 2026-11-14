@@ -42,12 +42,15 @@ constexpr uint32_t PAIRING_WINDOW_MS = 60000;   // how long a pairing window sta
 constexpr uint32_t FORGET_HOLD_MS = 5000;       // hold the button this long to forget all gamepads
 
 // ---- Gamepad mapping ---------------------------------------------------------------------------------
-// Buttons use Bluepad32's names, which follow the Xbox layout whatever the gamepad:
-// A = bottom face button (Cross on PlayStation, B on Switch), B = right, X = left, Y = top.
+// The layout matches the ROS 2 stack's; the buttons themselves are in Gamepad::update().
+// Bluepad32 names buttons by position, Xbox-style, whatever the gamepad.
 
 constexpr int STICK_DEADZONE = 12;              // out of ±128, on top of the robot's own
-constexpr int HEIGHT_STEP_MM = 10;              // per D-pad press
-constexpr uint32_t POWER_DOWN_HOLD_MS = 2000;   // hold Start/Options/Menu this long
+constexpr int HEIGHT_STEP_MM = 10;              // per D-pad step (ROS 2: height_step)
+constexpr uint32_t HEIGHT_REPEAT_MS = 300;      // D-pad held: a step this often (ROS 2: height_repeat)
+constexpr int HEIGHT_MIN_MM = 60;               // gait core's GaitParams min/max_height; the robot refuses others
+constexpr int HEIGHT_MAX_MM = 160;
+constexpr uint32_t POWER_DOWN_HOLD_MS = 2000;   // hold RB this long to power down (ROS 2: power_down_hold)
 
 }  // namespace config
 

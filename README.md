@@ -150,21 +150,36 @@ Bluepad32 supports, among others, DualShock 4, DualSense, Xbox Wireless (control
 Bluetooth, on firmware 5.x), Switch Pro, Joy-Con, 8BitDo, Stadia and generic BLE gamepads. See its
 [supported controllers](https://bluepad32.readthedocs.io/en/latest/supported_gamepads/).
 
-| Input | Does | Packet |
-| --- | --- | --- |
-| Left stick | Walk: forward/back, and strafe or turn (by mode). Tilt mode: shift the body | `joystick1X/Y` |
-| Right stick | Turn. Tilt mode: roll and pitch the body | `joystick2X/Y` |
-| A (Cross, or B on Switch) | Stand up | `CMD_SIT 0` |
-| B (Circle, or A on Switch) | Sit down | `CMD_SIT 1` |
-| R1 / RB | Next gait (tripod, ripple, wave) | `CMD_SET_GAIT` |
-| L1 / LB | Next mode (normal, strafe, tilt) | `CMD_SET_MODE` |
-| D-pad up / down | Body height ±10 mm from the robot's current height | `currentHeight` |
-| Hold Start / Options / Menu for 2 s | Power down: sit, then servo power off | `CMD_POWER_DOWN` |
+The layout matches the ROS 2 stack's `controller_teleop`
+([ROS 2 > Driving](https://github.com/TH4R4V3N1324/hexapod-docs/blob/main/docs/stacks/ros2/driving.md#gamepad-controls)),
+so one gamepad drives every robot the same way. Buttons are named Xbox-first, with PlayStation in
+brackets; Bluepad32 names them by position, so a Switch or 8BitDo gamepad uses the same places.
 
-Buttons are by position, Xbox names: A is always the bottom face button. Each command is held for
-150 ms and then cleared, so pressing the same button again counts. Config mode and calibration are
-left to the handheld controller. The step sizes, timings and dead zone are in `Config.h`; the button
-choices are in `Gamepad::update()`.
+| Input | Walking (normal / strafe) | Tilt mode | Same as ROS 2 |
+|---|---|---|---|
+| Left stick | Forward/back, left/right | Shift the body forward/back, left/right | ✅ |
+| Right stick X | Turn | Roll | ✅ |
+| Right stick Y | — | Pitch (forward lowers the nose) | ✅ |
+| D-pad up / down | Body height up / down 1 cm (repeats while held) | — | ✅ walking. Tilt mode raises/lowers the body in ROS 2; not in the packet yet |
+| RB [R1] | Sit down / stand up; hold 2 s to power down | The same | ✅ (see below) |
+| Start [Options] | Next mode | Next mode | ✅ |
+| Back [Create] | Next gait | Next gait | ✅ |
+| LT / RT [L2 / R2] | — | — | ROS 2: yaw in tilt mode. Not in the packet yet |
+| A, B, X, Y | — | — | ROS 2: feature toggles. Not in the packet yet |
+
+**RB** acts when released: it sits the robot down if it's standing, and stands it up otherwise
+(which also turns the servos back on). Held for 2 s it powers down instead: sit, then servo power
+off. ROS 2 knows whether the robot is seated from `/seated`, but `HexPacket` doesn't carry that, so
+the receiver follows the commands it has sent. Both robots start seated. If the robot sits by
+itself (the Servo 2040 also stands by itself 5 s after boot, and the battery behaviour can sit
+either robot), the next press does nothing and the one after works.
+
+The **D-pad** moves the body 1 cm per step, every 0.3 s while held, within gait core's 6–16 cm. It
+does nothing while seated. Quick presses add up while the body is still moving.
+
+Each command is held for 150 ms and then cleared, so pressing the same button again counts. Config
+mode and calibration are left to the handheld controller. Step sizes, timings and the dead zone are
+in `Config.h`; the buttons are in `Gamepad::update()`.
 
 When a gamepad connects it rumbles briefly, and gamepads with lights show player 1 and a blue light
 bar.

@@ -2,6 +2,7 @@
 
 #include <freertos/FreeRTOS.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 extern "C" {
@@ -188,8 +189,13 @@ Command heldCommand = CMD_NONE;
 int16_t heldArgs[3] = {};
 uint32_t heldUntilMs = 0;
 int16_t heightTarget = 0;         // 0 = not set; the robot keeps its own height
-uint32_t startPressedMs = 0;
+uint32_t nextHeightStepMs = 0;    // D-pad held: when the next step happens
+uint32_t sitPressedMs = 0;        // RB held since (0 = not held)
 bool powerDownSent = false;
+// Whether the robot is seated. HexPacket doesn't say, so it follows the commands sent from here.
+// Both robots start seated (the Servo 2040 then stands by itself after 5 s, so its first press
+// asks to stand again, which does nothing; the second sits).
+bool seated = true;
 
 void issue(Command command, int16_t arg0, uint32_t nowMs) {
     heldCommand = command;
@@ -229,49 +235,70 @@ uint32_t update(uint32_t nowMs, const HexPacket& status, ControlPacket& out) {
     if (reportMs == 0) {
         previous = {};
         heldCommand = CMD_NONE;
-        startPressedMs = 0;
+        sitPressedMs = 0;
         heightTarget = 0;
         return 0;
     }
 
-    // Sticks: left drives, right turns (tilt mode: left shifts the body, right tilts it).
-    // The packet's Y is forward, Bluepad32's is down.
+    // The layout follows the ROS 2 stack's controller_teleop (hexapod-ros2 ab90916), so one gamepad
+    // drives every robot the same way. Not available over the packet yet: A/B/X/Y (feature toggles
+    // in ROS 2), LT/RT (yaw in tilt mode) and the D-pad in tilt mode (raise/lower the body).
+
+    // Left stick: walk (tilt mode: shift the body). Right stick: X turns (tilt mode: roll),
+    // Y pitches in tilt mode. The packet's Y is forward, Bluepad32's is down.
     out.joystick1X = axis(gp.axis_x);
     out.joystick1Y = axis(-gp.axis_y);
     out.joystick2X = axis(gp.axis_rx);
     out.joystick2Y = axis(-gp.axis_ry);
 
-    // A stand, B sit
-    if (pressed(gp.buttons, previous.buttons, BUTTON_A)) issue(CMD_SIT, 0, nowMs);
-    if (pressed(gp.buttons, previous.buttons, BUTTON_B)) issue(CMD_SIT, 1, nowMs);
-
-    // R1 next gait, L1 next mode (normal, strafe, tilt; config mode is for the handheld controller)
-    if (pressed(gp.buttons, previous.buttons, BUTTON_SHOULDER_R)) {
-        issue(CMD_SET_GAIT, (int16_t)((status.currentGait + 1) % NUM_GAITS), nowMs);
-    }
-    if (pressed(gp.buttons, previous.buttons, BUTTON_SHOULDER_L)) {
+    // Start [Options]: next mode (normal, strafe, tilt; config mode is for the handheld controller)
+    if (pressed(gp.misc_buttons, previous.misc_buttons, MISC_BUTTON_START)) {
         const int next = status.currentMode >= MODE_TILT ? MODE_NORMAL : status.currentMode + 1;
         issue(CMD_SET_MODE, (int16_t)next, nowMs);
     }
-
-    // D-pad up/down: body height, a step at a time from where the robot is now
-    if (status.currentHeight > 0) {
-        if (pressed(gp.dpad, previous.dpad, DPAD_UP)) heightTarget = status.currentHeight + config::HEIGHT_STEP_MM;
-        if (pressed(gp.dpad, previous.dpad, DPAD_DOWN)) heightTarget = status.currentHeight - config::HEIGHT_STEP_MM;
+    // Back [Create]: next gait
+    if (pressed(gp.misc_buttons, previous.misc_buttons, MISC_BUTTON_SELECT)) {
+        issue(CMD_SET_GAIT, (int16_t)((status.currentGait + 1) % NUM_GAITS), nowMs);
     }
-    out.currentHeight = heightTarget;
 
-    // Hold Start/Options/Menu: power down (sit, then servo power off)
-    if (gp.misc_buttons & MISC_BUTTON_START) {
-        if (startPressedMs == 0) startPressedMs = nowMs;
-        if (!powerDownSent && nowMs - startPressedMs >= config::POWER_DOWN_HOLD_MS) {
+    // RB [R1]: on release, sit down if standing, otherwise stand up (which also powers the servos
+    // back on). Held for POWER_DOWN_HOLD_MS: power down instead (sit, then servo power off).
+    if (gp.buttons & BUTTON_SHOULDER_R) {
+        if (sitPressedMs == 0) {
+            sitPressedMs = nowMs;
+            powerDownSent = false;
+        }
+        if (!powerDownSent && nowMs - sitPressedMs >= config::POWER_DOWN_HOLD_MS) {
             issue(CMD_POWER_DOWN, 0, nowMs);
             powerDownSent = true;
+            seated = true;
         }
-    } else {
-        startPressedMs = 0;
-        powerDownSent = false;
+    } else if (sitPressedMs != 0) {
+        if (!powerDownSent) {
+            issue(CMD_SIT, seated ? 0 : 1, nowMs);
+            seated = !seated;
+        }
+        sitPressedMs = 0;
     }
+
+    // D-pad up/down, walking: body height a step at a time, repeating while held; nothing while
+    // seated. A step continues from the last target while the body is still on its way there, so
+    // quick presses add up; otherwise from where the body is. (In tilt mode ROS 2 uses the D-pad
+    // to shift the body up and down, which the packet can't carry, so it does nothing here.)
+    const int dir = (gp.dpad & DPAD_UP) ? 1 : (gp.dpad & DPAD_DOWN) ? -1 : 0;
+    const bool newPress = pressed(gp.dpad, previous.dpad, DPAD_UP | DPAD_DOWN);
+    if (dir != 0 && !seated && status.currentMode != MODE_TILT && status.currentHeight > 0 &&
+        (newPress || (int32_t)(nowMs - nextHeightStepMs) >= 0)) {
+        const int current = status.currentHeight;
+        const int from = (heightTarget != 0 && abs(current - heightTarget) < config::HEIGHT_STEP_MM)
+                             ? heightTarget : current;
+        int target = from + dir * config::HEIGHT_STEP_MM;
+        if (target < config::HEIGHT_MIN_MM) target = config::HEIGHT_MIN_MM;
+        if (target > config::HEIGHT_MAX_MM) target = config::HEIGHT_MAX_MM;
+        heightTarget = (int16_t)target;
+        nextHeightStepMs = nowMs + config::HEIGHT_REPEAT_MS;
+    }
+    out.currentHeight = heightTarget;
 
     // Hold each command briefly, then clear it, so the robot sees a repeat press as new
     if (heldCommand != CMD_NONE && (int32_t)(nowMs - heldUntilMs) < 0) {
@@ -287,7 +314,7 @@ uint32_t update(uint32_t nowMs, const HexPacket& status, ControlPacket& out) {
     // sticks and no buttons held are safe to repeat, so count it as alive while connected; a
     // deflected stick that goes quiet still trips the failsafe.
     const bool resting = out.joystick1X == 0 && out.joystick1Y == 0 && out.joystick2X == 0 &&
-                         out.joystick2Y == 0 && gp.buttons == 0 && gp.misc_buttons == 0;
+                         out.joystick2Y == 0 && gp.buttons == 0 && gp.misc_buttons == 0 && gp.dpad == 0;
     return resting ? nowMs : reportMs;
 }
 
