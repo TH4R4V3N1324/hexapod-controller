@@ -95,7 +95,7 @@ external/
   hexapod-gait-core/   Submodule: the packets (hexapod_protocol/) and gamepad layout (hexapod_teleop/)
                        every stack shares; only those two headers are used here
   lvgl/                Submodule, LVGL v8.4.0 (touch controller)
-  bluepad32/           Submodule, Bluepad32 4.2.0, with BTstack inside it (receiver)
+  bluepad32/           Submodule, Bluepad32 5.0.0-beta0, with BTstack inside it (receiver)
 oled-controller/       OLED controller (PCB rev v5, ESP32-S3; rev v3, ESP32-S2, with -e v3)
   include/, src/
     Board.h            Pins for each PCB revision
@@ -284,7 +284,7 @@ monitor.
 - **Receiver I²C:** a classic ESP32 can't stretch the clock as a slave, so a read gets whatever is
   already in the TX FIFO. The receiver keeps one `ControlPacket` loaded and replaces it with the
   newest after every read (as Arduino's `Wire` does), so the Servo 2040 gets packets one tick old.
-- **Bluepad32 and BTstack:** `external/bluepad32` is pinned to 4.2.0, and its own BTstack submodule
+- **Bluepad32 and BTstack:** `external/bluepad32` is pinned to 5.0.0-beta0, and its own BTstack submodule
   comes with it. Bluepad32 normally copies BTstack into an ESP-IDF component inside the submodule
   (`integrate_btstack.py`); `receiver/CMakeLists.txt` does the same copy into `build/` instead, so
   the submodule stays clean. Bluepad32 also suggests a BTstack patch that relaxes the security

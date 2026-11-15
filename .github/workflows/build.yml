@@ -40,6 +40,6 @@ jobs:
           submodules: recursive   # gait-core, LVGL, Bluepad32 and the BTstack inside it
       - uses: espressif/esp-idf-ci-action@v1
         with:
-          esp_idf_version: v5.3.4
+          esp_idf_version: v5.5.1
           target: ${{ matrix.target }}
           path: ${{ matrix.project }}
