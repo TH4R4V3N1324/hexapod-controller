@@ -26,6 +26,8 @@ constexpr int I2C_SCL_PIN = 22;
 // ---- Timing ----------------------------------------------------------------------------------------
 
 constexpr uint32_t LOOP_PERIOD_MS = 10;          // control loop, and ESP-NOW relay rate
+constexpr bool PRINT_CONTROL_DATA = false;        // print the selected control packet to the monitor
+constexpr uint32_t CONTROL_PRINT_PERIOD_MS = 100;  // limit control output to 10 lines per second
 // Failsafe: an input source counts as lost after this long without a packet or report. When the
 // active one is lost, the sticks are centred and the command cleared, so the robot stops.
 constexpr uint32_t CONTROLLER_TIMEOUT_MS = 250;

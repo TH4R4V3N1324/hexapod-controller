@@ -3,6 +3,7 @@
 #include <driver/gpio.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
+#include <stdio.h>
 
 extern "C" {
 #include <btstack_port_esp32.h>
@@ -47,6 +48,23 @@ void updateLed(uint32_t now, Source source) {
     gpio_set_level((gpio_num_t)config::STATUS_LED_PIN, on ? 1 : 0);
 }
 
+void printControl(uint32_t now, Source source) {
+    static uint32_t lastPrintMs = 0;
+    if (!config::PRINT_CONTROL_DATA ||
+        (lastPrintMs != 0 && now - lastPrintMs < config::CONTROL_PRINT_PERIOD_MS)) {
+        return;
+    }
+    lastPrintMs = now;
+
+    const ControlPacket packet = link::control();
+    printf("Control [%s]: sticks=(%d,%d) right=(%d,%d) tilt=(%d,%d) height=%d "
+           "command=%u args=(%d,%d,%d)\n",
+           link::sourceName(source), packet.joystick1X, packet.joystick1Y, packet.joystick2X,
+           packet.joystick2Y, packet.tiltYaw, packet.tiltZ, packet.currentHeight,
+           static_cast<unsigned>(packet.command), packet.commandArgs[0], packet.commandArgs[1],
+           packet.commandArgs[2]);
+}
+
 void receiverTask(void*) {
     gpio_reset_pin((gpio_num_t)config::PAIR_BUTTON_PIN);
     gpio_set_direction((gpio_num_t)config::PAIR_BUTTON_PIN, GPIO_MODE_INPUT);
@@ -65,6 +83,7 @@ void receiverTask(void*) {
         link::gamepadInput(fromGamepad, lastReport);
 
         const Source source = link::update(now);
+        printControl(now, source);
         espnow::relay();
 
         handlePairButton(now);
