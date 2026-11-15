@@ -40,7 +40,7 @@ void I2CManager::deinit() {
 @note This function uses a timeout defined by I2C_MASTER_TIMEOUT_MS
 */
 bool I2CManager::write(uint8_t addr, uint8_t *data, size_t len) {
-    return i2c_master_write_to_device(port, addr, data, len, I2C_MASTER_TIMEOUT_MS / portTICK_PERIOD_MS);
+    return i2c_master_write_to_device(port, addr, data, len, I2C_MASTER_TIMEOUT_MS / portTICK_PERIOD_MS) == ESP_OK;
 }
 
 /*
@@ -52,7 +52,7 @@ bool I2CManager::write(uint8_t addr, uint8_t *data, size_t len) {
 @note This function uses a timeout defined by I2C_MASTER_TIMEOUT_MS
 */
 bool I2CManager::read(uint8_t addr, uint8_t *data, size_t len) {
-    return i2c_master_read_from_device(port, addr, data, len, I2C_MASTER_TIMEOUT_MS / portTICK_PERIOD_MS);
+    return i2c_master_read_from_device(port, addr, data, len, I2C_MASTER_TIMEOUT_MS / portTICK_PERIOD_MS) == ESP_OK;
 }
 
 /*

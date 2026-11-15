@@ -1,7 +1,10 @@
 #include "Display.h"
 
-// Constructor for OLED screen, esp32s2 SPI default is 36(SCK) and 35(MOSI)
-U8G2_SSD1309_128X64_NONAME0_F_4W_HW_SPI u8g2(U8G2_R0, /* cs=*/ 34, /* dc=*/ 33, /* reset=*/ 21);
+#include <SPI.h>
+#include "Board.h"
+
+// OLED on hardware SPI; pins are in Board.h
+U8G2_SSD1309_128X64_NONAME0_F_4W_HW_SPI u8g2(U8G2_R0, /* cs=*/ PIN_OLED_CS, /* dc=*/ PIN_OLED_DC, /* reset=*/ PIN_OLED_RST);
 
 Display display;
 
@@ -108,6 +111,8 @@ void Display::drawPageItems(page* pages, int NUM_ITEMS, bool itemIcons, bool hex
 @brief Initializes the display
 */
 void Display::initializeDisplay() {
+    // Put the SPI bus on this board's pins first: U8g2's SPI.begin() then keeps them
+    SPI.begin(PIN_OLED_CLK, -1, PIN_OLED_MOSI, PIN_OLED_CS);
     // Initialize the display
     u8g2.begin();
     u8g2.setFont(u8g2_font_5x8_mn);

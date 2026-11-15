@@ -3,21 +3,22 @@
 #include "DataPacket.h"
 #include <stdint.h>
 #include <Arduino.h>
-#define stick1X 2
-#define stick1Y 1
-#define stick2X 5 
-#define stick2Y 6 
-#define button1 38
-#define button2 39
-#define button3 40
-#define button4 41
-#define switch1 15
-#define switch2 14
-#define switch3 16
-#define switch4 17
-#define encoderA 9
-#define encoderB 8
-#define encoderButton 7
+#include "Board.h"   // pins for the PCB revision being built
+#define stick1X PIN_STICK1_X
+#define stick1Y PIN_STICK1_Y
+#define stick2X PIN_STICK2_X
+#define stick2Y PIN_STICK2_Y
+#define button1 PIN_BUTTON1
+#define button2 PIN_BUTTON2
+#define button3 PIN_BUTTON3
+#define button4 PIN_BUTTON4
+#define switch1 PIN_SWITCH1
+#define switch2 PIN_SWITCH2
+#define switch3 PIN_SWITCH3
+#define switch4 PIN_SWITCH4
+#define encoderA PIN_ENC_A
+#define encoderB PIN_ENC_B
+#define encoderButton PIN_ENC_BTN
 
 // Declaration of encoder states
 enum EncoderStates {AB, Ab, aB, ab};

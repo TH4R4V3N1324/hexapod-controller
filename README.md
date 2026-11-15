@@ -12,15 +12,16 @@ The robot, its build, and how the stacks fit together are documented in
 [hexapod-hardware](https://github.com/TH4R4V3N1324/hexapod-hardware/tree/main/controllers). This
 README only covers building and working on the firmware.
 
-> **Status:** on hold. The OLED controller was built for an earlier prototype. It now speaks the
-> current packet layout, but it hasn't been tested against either robot stack yet. Gamepad support
-> in the receiver builds but hasn't been tested on hardware.
+> **Status:** on hold. The OLED controller is a community design, not a supported way to drive the
+> robots: use a Bluetooth gamepad through the receiver, or the Steam Deck on ROS 2. Its current PCB,
+> rev v5 (ESP32-S3), is routed and the firmware builds for it, but no v5 board has been built or
+> tested yet. Gamepad support in the receiver builds but hasn't been tested on hardware.
 
 ## Projects
 
 | Folder | What it is | Board | Toolchain |
 | --- | --- | --- | --- |
-| [`oled-controller/`](oled-controller/) | **OLED controller**: two sticks, buttons, encoder, menus on a 128×64 OLED | [OLED controller](https://github.com/TH4R4V3N1324/hexapod-hardware/tree/main/controllers/oled-controller) PCB, rev v3 (ESP32-S2) | PlatformIO, Arduino |
+| [`oled-controller/`](oled-controller/) | **OLED controller**: two sticks, buttons, encoder, menus on a 128×64 OLED | [OLED controller](https://github.com/TH4R4V3N1324/hexapod-hardware/tree/main/controllers/oled-controller) PCB, rev v5 (ESP32-S3); rev v3 (ESP32-S2) still builds | PlatformIO, Arduino |
 | [`receiver/`](receiver/) | **Receiver**: handheld controller (ESP-NOW) or Bluetooth gamepad in; Servo 2040 (I²C) or the robot's ESP32 (ESP-NOW) out | Any classic ESP32 dev board (needs Bluetooth Classic and BLE) | ESP-IDF 5.3, Bluepad32 4.2 |
 | [`touch-controller/display/`](touch-controller/display/) | **Touch controller** (experimental): LVGL touchscreen UI, IMU, RTC, SD card | ESP32-S3 2.8" RGB LCD board | ESP-IDF 5.3, LVGL 8.4 |
 | [`touch-controller/left-board/`, `right-board/`](touch-controller/) | The touch controller's side boards: a stick each, plus a D-pad (left) or encoder (right), polled by the display over UART | ATtiny1616 | PlatformIO, Arduino (megaTinyCore) |
@@ -44,9 +45,13 @@ pinned to the `espressif32` platform 6.11.0 (Arduino-ESP32 2.0.17), the same as 
 
 ```sh
 cd oled-controller
-pio run -t upload
+pio run -t upload          # PCB rev v5 (the default environment)
+pio run -e v3 -t upload    # the older rev v3 board
 pio device monitor
 ```
+
+Each PCB revision has its own environment in `platformio.ini`, and its pins are in
+`include/Board.h`.
 
 The receiver and the touch controller's display need
 [ESP-IDF](https://docs.espressif.com/projects/esp-idf/) **5.3**:
@@ -67,7 +72,8 @@ or `right-board/`.
 
 | Firmware | PCB revision | Hardware files |
 | --- | --- | --- |
-| `oled-controller/` | OLED controller, rev **v3** (ESP32-S2) | [`controllers/oled-controller`](https://github.com/TH4R4V3N1324/hexapod-hardware/tree/main/controllers/oled-controller) |
+| `oled-controller/`, `env:v5` | OLED controller, rev **v5** (ESP32-S3-MINI-1U), untested | [`controllers/oled-controller`](https://github.com/TH4R4V3N1324/hexapod-hardware/tree/main/controllers/oled-controller) |
+| `oled-controller/`, `env:v3` | OLED controller, rev v3 (ESP32-S2) | The same folder's git history (tag `oled-controller-v3`) |
 | `receiver/` | None (stock ESP32 DevKit) | — |
 | `touch-controller/` | ESP32-S3 display board plus two ATtiny1616 side boards | Not published |
 
@@ -90,15 +96,16 @@ external/
                        every stack shares; only those two headers are used here
   lvgl/                Submodule, LVGL v8.4.0 (touch controller)
   bluepad32/           Submodule, Bluepad32 4.2.0, with BTstack inside it (receiver)
-oled-controller/       OLED controller (ESP32-S2, PCB rev v3)
+oled-controller/       OLED controller (PCB rev v5, ESP32-S3; rev v3, ESP32-S2, with -e v3)
   include/, src/
+    Board.h            Pins for each PCB revision
     main.cpp           Entry point and loop
     ControllerLogic    Page navigation; turns button presses into commands
     Input              Sticks (centred at boot, ±128, deadzone), buttons and encoder
     DataPacket         ESP-NOW: sends a ControlPacket every 10 ms, receives HexPackets
     Display, Pages     Menus on the SSD1309 128×64 OLED (U8g2)
     bitmaps.h          Screen icons, compiled in
-    sensors/           BMI330 IMU and INA260 battery current sensor
+    sensors/           v5: MAX17048 fuel gauge (BMI270 IMU: no driver yet). v3: BMI330 IMU, INA260
   assets/
     screens/           Icon PNGs, the sources of bitmaps.h
     psd/               Page mock-ups and fonts
