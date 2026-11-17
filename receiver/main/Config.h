@@ -44,7 +44,7 @@ constexpr uint32_t PAIRING_WINDOW_MS = 60000;   // how long a pairing window sta
 constexpr uint32_t FORGET_HOLD_MS = 5000;       // hold the button this long to forget all gamepads
 
 // ---- Gamepad mapping ---------------------------------------------------------------------------------
-// The layout is hexapod-gait-core's hexapod_teleop::GamepadTeleop (shared with ROS 2); these tune it.
+// The layout is hexapod-gait-core's gait_core::teleop::GamepadTeleop (shared with ROS 2); these tune it.
 // Bluepad32 names buttons by position, Xbox-style, whatever the gamepad.
 
 constexpr int STICK_DEADZONE = 12;              // out of ±128, on top of the robot's own

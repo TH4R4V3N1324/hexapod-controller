@@ -3,7 +3,7 @@
 #ifndef RECEIVER_LINK_H
 #define RECEIVER_LINK_H
 #include <stdint.h>
-#include <hexapod_protocol/packets.h>
+#include <gait_core/protocol/packets.h>
 
 enum Source : uint8_t {
     SOURCE_NONE,        // nothing driving: sticks centred, no command (the failsafe)

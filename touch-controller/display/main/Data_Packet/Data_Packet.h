@@ -23,7 +23,7 @@
 #define UART_BUF_SIZE 256
 
 // ControlPacket, HexPacket, Command, Gait, Mode: shared with the robot firmware
-#include <hexapod_protocol/packets.h>
+#include <gait_core/protocol/packets.h>
 
 typedef struct __attribute__((packed)) {
     uint8_t start;    

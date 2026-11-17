@@ -37,6 +37,6 @@ idf_component_register(
                  "./UI_Animation"
                  "./Data_Packet"
                  "."
-                 # hexapod_protocol/packets.h from the gait-core submodule: the packets every robot uses
+                 # gait_core/protocol/packets.h from the gait-core submodule: the packets every robot uses
                  "../../../external/hexapod-gait-core/include"
 )

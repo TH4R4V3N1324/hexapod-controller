@@ -3,7 +3,7 @@
 
 #include "bitmaps.h"
 #include "Input.h"
-#include <hexapod_protocol/packets.h>
+#include <gait_core/protocol/packets.h>
 
 // Main FSM states, matches availble pages
 enum States {

@@ -92,7 +92,7 @@ S3 and C3 have only BLE, which leaves out PlayStation and Switch Pro controllers
 
 ```text
 external/
-  hexapod-gait-core/   Submodule: the packets (hexapod_protocol/) and gamepad layout (hexapod_teleop/)
+  hexapod-gait-core/   Submodule (v0.9.0): the packets (gait_core/protocol/) and gamepad layout (gait_core/teleop/)
                        every stack shares; only those two headers are used here
   lvgl/                Submodule, LVGL v8.4.0 (touch controller)
   bluepad32/           Submodule, Bluepad32 5.0.0-beta0, with BTstack inside it (receiver)
@@ -159,7 +159,7 @@ Bluepad32 supports, among others, DualShock 4, DualSense, Xbox Wireless (control
 Bluetooth, on firmware 5.x), Switch Pro, Joy-Con, 8BitDo, Stadia and generic BLE gamepads. See its
 [supported controllers](https://bluepad32.readthedocs.io/en/latest/supported_gamepads/).
 
-The layout is hexapod-gait-core's `hexapod_teleop::GamepadTeleop`, the same code ROS 2's
+The layout is hexapod-gait-core's `gait_core::teleop::GamepadTeleop`, the same code ROS 2's
 `controller_teleop` runs, so one gamepad drives every robot the same way
 ([ROS 2 > Driving](https://github.com/TH4R4V3N1324/hexapod-docs/blob/main/docs/stacks/ros2/driving.md#gamepad-controls)).
 Buttons are named Xbox-first, with PlayStation in brackets; Bluepad32 names them by position, so a
@@ -196,12 +196,12 @@ bar.
 ## Robot interface
 
 The packets are hexapod-gait-core's
-[`hexapod_protocol/packets.h`](https://github.com/TH4R4V3N1324/hexapod-gait-core/blob/main/include/hexapod_protocol/packets.h),
+[`gait_core/protocol/packets.h`](https://github.com/TH4R4V3N1324/hexapod-gait-core/blob/main/include/gait_core/protocol/packets.h),
 which every controller and robot includes, so they can't drift apart. Both packets start with
-`HEXAPOD_PROTOCOL_VERSION` (2), and each end drops packets of another size or version.
+`HEXAPOD_PROTOCOL_VERSION` (4), and each end drops packets of another size or version.
 
 ```cpp
-struct ControlPacket {           // controller → robot, 22 bytes
+struct ControlPacket {           // controller → robot, 29 bytes
     uint8_t version;             // HEXAPOD_PROTOCOL_VERSION
     int16_t joystick1X, joystick1Y, joystick2X, joystick2Y;  // ±128, X right, Y forward
     int16_t tiltYaw;             // tilt mode: yaw, positive turns left
@@ -209,23 +209,26 @@ struct ControlPacket {           // controller → robot, 22 bytes
     int16_t currentHeight;       // body height in mm, 0 = unchanged
     Command command;
     int16_t commandArgs[3];
+    int16_t controllerRoll, controllerPitch, controllerYaw;  // controller orientation, mrad
+    uint8_t controllerTilt;      // LB held with a controller IMU: the orientation fields are valid
 };
 
-struct HexPacket {               // robot → controller, 12 bytes, in reply to each packet
+struct HexPacket {               // robot → controller, 19 bytes, in reply to each packet
     uint8_t version;
-    int16_t legConfigs[3];       // calibration offsets requested with CMD_REQUEST_CONFIG
+    int16_t legConfigs[6];       // calibration offsets requested with CMD_REQUEST_CONFIG, body to foot
     int16_t currentHeight;       // mm
     Gait currentGait;
     Mode currentMode;
     uint8_t flags;               // HEX_FLAG_SEATED, HEX_FLAG_SERVO_POWER, HEX_FLAG_FEATURE(f)
+    uint8_t numGaits;            // how many gaits the robot has
 };
 ```
 
 | Command | Arguments | OLED controller | Receiver (gamepad) |
 | --- | --- | --- | --- |
-| `CMD_SET_GAIT` | `[0]` gait | Button 2 on the home page, or the gait page | Back |
+| `CMD_SET_GAIT` | `[0]` gait, 0 to `numGaits` − 1 | Button 2 on the home page, or the gait page | Back |
 | `CMD_SET_MODE` | `[0]` mode. `MODE_CONFIG` moves every joint to its centre plus its offset | Button 3 on the home page, or the mode page. Opening the config page sends `MODE_CONFIG` | Start |
-| `CMD_SET_CONFIG` | `[0]` leg 0–5, `[1]` joint 0–2, `[2]` offset in degrees (robot clamps to ±60) | Joint page | — |
+| `CMD_SET_CONFIG` | `[0]` leg 0–5, `[1]` joint 0–5 (body to foot), `[2]` offset in degrees (robot clamps to ±60) | Joint page | — |
 | `CMD_HOME_STANCE` | Stand up | Going back from the config page to the menu | — |
 | `CMD_REQUEST_CONFIG` | `[0]` leg; its offsets come back in `legConfigs` | — | — |
 | `CMD_SIT` | `[0]` 1 sit, 0 stand | — | RB |

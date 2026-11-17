@@ -4,7 +4,7 @@
 #include <Arduino.h>
 #include <esp_now.h>
 #include <WiFi.h>
-#include <hexapod_protocol/packets.h>   // hexapod-gait-core: ControlPacket, HexPacket, Command, Gait, Mode
+#include <gait_core/protocol/packets.h>   // hexapod-gait-core: ControlPacket, HexPacket, Command, Gait, Mode
 
 extern ControlPacket controlPacket;
 extern HexPacket hexPacket;

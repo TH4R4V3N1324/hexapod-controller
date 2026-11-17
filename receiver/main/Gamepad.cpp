@@ -12,7 +12,7 @@ extern "C" {
 
 #include <optional>
 
-#include <hexapod_teleop/gamepad_teleop.hpp>
+#include <gait_core/teleop/gamepad_teleop.hpp>
 
 #include "Clock.h"
 #include "Config.h"
@@ -180,14 +180,14 @@ const uni_property_t* getProperty(uni_property_idx_t) {
 void onOobEvent(uni_platform_oob_event_t, void*) {}
 
 // ---- Mapping (loop task) -------------------------------------------------------------------------
-// The layout is gait-core's hexapod_teleop::GamepadTeleop, the same one ROS 2's controller_teleop
+// The layout is gait-core's gait_core::teleop::GamepadTeleop, the same one ROS 2's controller_teleop
 // uses. This file only turns Bluepad32's reports into its input, and its output into packets.
 
-hexapod_teleop::GamepadTeleop teleop = [] {
-    hexapod_teleop::TeleopParams p;
+gait_core::teleop::GamepadTeleop teleop = [] {
+    gait_core::teleop::TeleopParams p;
     p.powerDownHold = config::POWER_DOWN_HOLD_MS / 1000.0;
     p.heightRepeat = config::HEIGHT_REPEAT_MS / 1000.0;
-    return hexapod_teleop::GamepadTeleop(p);
+    return gait_core::teleop::GamepadTeleop(p);
 }();
 
 Command heldCommand = CMD_NONE;
@@ -208,8 +208,8 @@ int16_t toAxis(float v) {
     return static_cast<int16_t>(scaled < -128.0f ? -128 : scaled > 127.0f ? 127 : scaled);
 }
 
-hexapod_teleop::GamepadState toGamepadState(const uni_gamepad_t& gp) {
-    hexapod_teleop::GamepadState pad;
+gait_core::teleop::GamepadState toGamepadState(const uni_gamepad_t& gp) {
+    gait_core::teleop::GamepadState pad;
     pad.leftX = stick(gp.axis_x);
     pad.leftY = -stick(gp.axis_y);    // Bluepad32's Y is down
     pad.rightX = stick(gp.axis_rx);
@@ -271,12 +271,12 @@ uint32_t update(uint32_t nowMs, const HexPacket& status, ControlPacket& out) {
 
     // Until the robot has answered, assume it's seated, as both robots start
     const bool heard = status.version == HEXAPOD_PROTOCOL_VERSION;
-    hexapod_teleop::RobotState robot;
+    gait_core::teleop::RobotState robot;
     robot.seated = !heard || (status.flags & HEX_FLAG_SEATED);
     robot.tiltMode = heard && status.currentMode == MODE_TILT;
 
-    const hexapod_teleop::GamepadState pad = toGamepadState(gp);
-    const hexapod_teleop::TeleopOutput o = teleop.update(pad, robot, nowMs / 1000.0);
+    const gait_core::teleop::GamepadState pad = toGamepadState(gp);
+    const gait_core::teleop::TeleopOutput o = teleop.update(pad, robot, nowMs / 1000.0);
 
     // The packet carries raw stick directions (X right, Y forward); the robot reads them as walking
     // or tilting by its mode, the same way GamepadTeleop's two sets of outputs do
@@ -293,7 +293,12 @@ uint32_t update(uint32_t nowMs, const HexPacket& status, ControlPacket& out) {
         const int next = status.currentMode >= MODE_TILT ? MODE_NORMAL : status.currentMode + 1;
         issue(CMD_SET_MODE, (int16_t)next, 0, nowMs);
     }
-    if (o.nextGait) issue(CMD_SET_GAIT, (int16_t)((status.currentGait + 1) % NUM_GAITS), 0, nowMs);
+    if (o.nextGait) {
+        // Each robot numbers its own gaits and reports how many it has; until it has answered,
+        // assume explorer's
+        const int numGaits = heard && status.numGaits > 0 ? status.numGaits : NUM_GAITS;
+        issue(CMD_SET_GAIT, (int16_t)((status.currentGait + 1) % numGaits), 0, nowMs);
+    }
     for (int f = 0; f < NUM_FEATURES; ++f) {
         if (o.toggleFeature[f]) {
             const bool on = heard && (status.flags & HEX_FLAG_FEATURE(f));
@@ -306,7 +311,7 @@ uint32_t update(uint32_t nowMs, const HexPacket& status, ControlPacket& out) {
     }
     if (o.powerDown) issue(CMD_POWER_DOWN, 0, 0, nowMs);
     if (o.heightStep != 0 && status.currentHeight > 0) {
-        heightTarget = hexapod_teleop::stepHeight(status.currentHeight, heightTarget, o.heightStep,
+        heightTarget = gait_core::teleop::stepHeight(status.currentHeight, heightTarget, o.heightStep,
                                                   config::HEIGHT_STEP_MM, config::HEIGHT_MIN_MM,
                                                   config::HEIGHT_MAX_MM);
     }
